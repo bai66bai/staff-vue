@@ -1,15 +1,3 @@
-<script setup>
-import {
-    Avatar,
-    User,
-    Crop,
-    EditPen,
-    SwitchButton,
-    CaretBottom
-} from '@element-plus/icons-vue'
-import avatar from '@/assets/default.png'
-</script>
-
 <template>
     <!-- elementPlus中的容器 -->
     <el-container class="layout-container">
@@ -47,7 +35,7 @@ import avatar from '@/assets/default.png'
         <el-container>
             <!-- 头部区域 -->
             <el-header>
-                <div>当前登录：<strong>admin</strong></div>
+                <div>当前登录：<strong>{{ sysUserName }}</strong></div>
                 <el-dropdown placement="bottom-end">
                     <span class="el-dropdown__box">
                         <el-avatar :src="avatar" />
@@ -67,9 +55,6 @@ import avatar from '@/assets/default.png'
             </el-header>
             <!-- 中间区域 -->
             <el-main>
-                <!-- <div style="width: 1290px; height: 570px;border: 1px solid red;">
-                    内容展示区
-                </div> -->
                 <RouterView></RouterView>
             </el-main>
             <!-- 底部区域 -->
@@ -78,8 +63,29 @@ import avatar from '@/assets/default.png'
     </el-container>
 </template>
 
+
+<script setup>
+import { Avatar,User,Crop,EditPen,SwitchButton,CaretBottom} from '@element-plus/icons-vue'
+import avatar from '@/assets/default.png'
+import useStore from '@/store'
+import { storeToRefs } from 'pinia';
+
+//pinia
+const store = useStore();
+const sysUserStore = store.sysUser
+const { sysUserName} = storeToRefs(sysUserStore);
+
+
+
+
+</script>
+
+
+
+
 <style lang="scss" scoped>
 .layout-container {
+    background-color: #fff;
     height: 100vh; 
     width: 100vw;
     .el-aside {

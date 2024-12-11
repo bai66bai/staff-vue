@@ -6,7 +6,6 @@
           <el-input v-model="searchForm.username" placeholder="请输入用户名"></el-input>
         </el-form-item>
         <el-form-item>
-          <!-- <el-input v-model="searchForm.phone" placeholder="请输入手机号"></el-input> -->
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handleSearch">搜索</el-button>
@@ -17,8 +16,8 @@
       <!-- 操作按钮 -->
       <div class="action-buttons">
         <el-button type="primary" @click="handleAdd">新增</el-button>
-        <el-button type="success" :disabled="!selectedRow" @click="handleEdit">修改</el-button>
-        <el-button type="danger" :disabled="!selectedRow" @click="handleDelete">删除</el-button>
+        <el-button type="success" :disabled="single" @click="handleEdit">修改</el-button>
+        <el-button type="danger" :disabled="multiple" @click="handleDelete">删除</el-button>
       </div>
   
       <!-- 表格 -->
@@ -36,7 +35,11 @@
         <el-table-column prop="deptName" label="部门" />
         <el-table-column prop="posName" label="岗位" />
         <el-table-column prop="phone" label="手机号" />
-        <el-table-column prop="createdTime" label="创建时间" />
+        <el-table-column prop="createdTime" label="创建时间">
+          <template  #default="scope">
+            {{scope.row.createdTime.toLocaleString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/, '')}}
+          </template>
+        </el-table-column>
         <el-table-column label="操作" width="150">
           <template #default="scope">
             <el-link type="primary" @click="handleEdit(scope.row)"><el-icon><Edit /></el-icon>修改</el-link>
@@ -66,7 +69,7 @@
       >
         <!-- 用户名 -->
         <el-form-item label="用户名" prop="username">
-          <el-input :disabled="title === '修改人员信息'" v-model="formData.username" placeholder="请输入用户名" />
+          <el-input v-model="formData.username" placeholder="请输入用户名" />
         </el-form-item>
 
         <!-- 昵称 -->
@@ -133,14 +136,6 @@
       <el-button  @click="dialogFormVisible = false">取消</el-button>
     </el-form-item>
       </el-form>
-    <!-- <template #footer>
-      <div class="dialog-footer">
-        <el-button @click="dialogFormVisible = false" >取消</el-button>
-        <el-button type="primary" @click="dialogFormVisible = false">
-          提交
-        </el-button>
-      </div>
-    </template> -->
   </el-dialog>
   
   </template>
@@ -163,29 +158,28 @@
         total: 3,
       });
 
-//控制表单开关
+      //控制表单开关
       const dialogFormVisible = ref(false)
+      const single = ref(true) //控制修改
+      const multiple = ref(true) //控制批量删除
       // 表格数据
       let tableData = ref();
     //获取人员列表数据
       const getPersonnelAllList = async ()=>{
         const result = await getPersonnelList(pagination.pageNum,pagination.pageSize,searchForm.username)
-        console.log(result.data.data.list);
-        tableData.value = result.data.data.list
-        pagination.pageNum = result.data.data.pageNum
-        pagination.pageSize = result.data.data.pageSize
-        pagination.total = result.data.data.total
+        console.log(result);
+          tableData.value = result.data.data.rows
+          pagination.total = result.data.data.total
+      
       }
 
       getPersonnelAllList();
       
       // 选中的行
-      const selectedRow = ref(null);
+      const selectedRow = ref<any[]>([]);
   
       // 搜索逻辑
       const handleSearch = () => {
-        console.log("搜索条件：", searchForm);
-        // 模拟搜索逻辑
         getPersonnelAllList();
       };
   
@@ -203,9 +197,13 @@
       };
   
  
+      const ids = ref<any>([])
+
       // 行选择变化
-      const handleSelectionChange = (rows: any) => {
-        selectedRow.value = rows[0] || null;
+      const handleSelectionChange = (rows: any[]) => {
+        ids.value = rows.map(item => item.userId)
+        single.value = rows.length != 1
+        multiple.value = !rows.length
       };
   
       // 分页变化
@@ -214,7 +212,8 @@
         getPersonnelAllList();
       };
   
-      const handlePageSizeChange = (size: number) => {
+      //页面显示条数变化
+      const handlePageSizeChange = (size: number) => {  
         pagination.pageSize = size;
         getPersonnelAllList();
       };
@@ -290,14 +289,6 @@
               trigger: 'change'
             }
           ],
-          entryTime:[
-            {
-              type: 'date',
-              required: true,
-              message: '请选择时间',
-              trigger: 'change'
-            }
-          ],
           email:[
           {
                 pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
@@ -334,8 +325,9 @@
         }
       )
         .then(async() => {
+          const userId:number | any[] = row.userId || ids.value
             //调用接口
-        const result =  await  deletePersonnel(row.userId)
+        const result =  await  deletePersonnel(userId)
         
           ElMessage({
             type: 'success',
@@ -357,8 +349,10 @@
           title.value = "修改人员信息"
           resetForm(ruleFormRef.value);
           dialogFormVisible.value = true
-          const {data} = await selectPersonnelByUserId(row.userId)
-          formData.userId = row.userId,
+          const userId:number= row.userId || ids.value[0]
+          const {data} = await selectPersonnelByUserId(userId)
+          
+          formData.userId = userId,
           formData.username = data.data.username,
           formData.birthday = data.data.birthday,
           formData.nickName = data.data.nickName,
@@ -369,8 +363,6 @@
           formData.phone = data.data.phone,
           formData.entryTime = data.data.entryTime,
           formData.politicalIdentity = data.data.politicalIdentity
-
-          
       };
 
   </script>

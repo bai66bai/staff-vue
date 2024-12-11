@@ -26,6 +26,7 @@ declare interface PageInfo<T extends Object = Object> {
     hasNextPage     :boolean,   // 是否存在下一页
     navigatePages   :number,    // 导航分页的页数
     navigatePageNums:number[],  // 导航分页的页码
-    list            :T[]        // 数据
+    list            :T[],        // 数据
+    rows            :T[]         //数据
 }
 

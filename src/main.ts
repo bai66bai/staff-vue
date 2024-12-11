@@ -15,7 +15,7 @@ app.use(createPinia())
 const pinia = createPinia();
 const persist = createPersistedState()
 pinia.use(persist)
-app.use(pinia)
+app.use(pinia) 
 app.use(ElementPlus,{locale: zhCn})
 app.use(router)
 app.mount('#app')

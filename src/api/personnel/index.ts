@@ -5,7 +5,7 @@ import type { Personnel , RuleForm } from './type'
 export const getPersonnelList = (pageNum:number, pageSize:number , username?:string):ResponsePromise<PageInfo<Personnel>> => {
     
     return  request({
-        url: '/user/selectAllUserList',
+        url: '/user/list',
         method:"GET",
         params:{
             pageNum,
@@ -28,20 +28,18 @@ export const addPersonnel = (formDate:RuleForm):ResponsePromise<string> =>{
 
 
 //删除人员信息
-export const deletePersonnel = (userId:number):ResponsePromise<string> =>{
+export const deletePersonnel = (userId:number | any[]):ResponsePromise<string> =>{
     return request({
-        url: '/user/delete',
-        method:"DELETE",
-        params:{userId}
+        url: '/user/' + userId,
+        method:"DELETE"
     })
 }
 
 //根据id查询人员信息
 export const selectPersonnelByUserId = (userId:number):ResponsePromise<RuleForm>=>{
     return request({
-        url:'/user/selectUserById',
-        method:"GET",
-        params:{userId}
+        url:'/user/' + userId,
+        method:"GET"
     })
 }
 
