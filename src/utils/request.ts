@@ -57,9 +57,8 @@ service.interceptors.response.use(
   (error: any) => {
 
     if (error instanceof Object && error.hasOwnProperty('response')) {
+      
       if (error.response.status === 401) {
-        console.log("401");
-        
         router.push('/login');
         ElMessage({
           message: '认证失败',

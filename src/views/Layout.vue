@@ -2,11 +2,10 @@
     <!-- elementPlus中的容器 -->
     <el-container class="layout-container">
         <!-- 左侧菜单 -->
-        <el-aside width="200px">
+        <el-aside width="255px">
             <div class="el-aside__logo"></div>
             <!-- 菜单标签 -->
-            <el-menu active-text-color="#ffd04b" background-color="#3b8eea"  text-color="#fff"
-                router>
+            <el-menu active-text-color="#ffd04b" background-color="#3b8eea"  text-color="#fff" router>
                 <el-menu-item index="/personnel">
                     <el-icon>
                         <Avatar />
@@ -99,6 +98,7 @@ const { sysUserName} = storeToRefs(sysUserStore);
         .el-menu {
             border-right: none;
             text-align: center;
+            
         }
     }
 

@@ -6,7 +6,7 @@ import component from 'element-plus/es/components/tree-select/src/tree-select-op
 const routes =[
   {path:'/',
     component:Layout,
-      redirect:'/personnel',
+      redirect:'/login',
       children:[
         { path:'/personnel',
         component:()=> import('@/views/personnel/PersonnelView.vue')}

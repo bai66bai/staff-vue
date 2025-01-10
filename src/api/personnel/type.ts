@@ -16,6 +16,7 @@ export interface Personnel{
 }
 
 export interface RuleForm {
+    [x: string]: any
     userId:number |null
     username:string //人员姓名
     nickName:string //昵称
