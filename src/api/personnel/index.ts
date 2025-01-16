@@ -36,9 +36,10 @@ export const deletePersonnel = (userId:number | any[]):ResponsePromise<string> =
 }
 
 //根据id查询人员信息
-export const selectPersonnelByUserId = (userId:number):ResponsePromise<RuleForm>=>{
+export const selectPersonnelByUserId = (userId?:number):ResponsePromise<RuleForm>=>{
+    const url = userId ? '/user/' + userId : '/user'
     return request({
-        url:'/user/' + userId,
+        url,
         method:"GET"
     })
 }
@@ -50,5 +51,13 @@ export const updatePersonnel = (formDate:RuleForm):ResponsePromise<string> =>{
         url: '/user/update',
         method:"PUT",
         data:formDate
+    })
+}
+
+//退出登录
+export const logout = ():ResponsePromise<string> =>{
+    return request({
+        url: '/user/logout',
+        method:"POST"
     })
 }

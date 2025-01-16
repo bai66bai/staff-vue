@@ -7,5 +7,12 @@ export default defineStore('sysUser', {
             token:'',       // JWT
         };
     },
+    actions: {
+        // 退出登录
+        logout() {
+            this.sysUserName = '';
+            this.token = '';
+        },
+    },
     persist:true
 })

@@ -1,15 +1,20 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Layout from '@/views/Layout.vue'
-import component from 'element-plus/es/components/tree-select/src/tree-select-option.mjs'
 
 //定义路由关系
 const routes =[
   {path:'/',
-    component:Layout,
-      redirect:'/login',
+    component: Layout,
+      redirect:'/personnel',
       children:[
         { path:'/personnel',
-        component:()=> import('@/views/personnel/PersonnelView.vue')}
+        component:()=> import('@/views/personnel/PersonnelView.vue')},
+        {path:'/position',
+          component:()=> import('@/views/position/PositionView.vue')
+        },
+        {path:'/profile',
+          component:()=> import('@/views/profile/Profile.vue')
+        }
   ]},
   {
     path:'/login',

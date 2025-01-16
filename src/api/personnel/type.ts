@@ -13,6 +13,7 @@ export interface Personnel{
     phone:string //手机号
     deptName:string //部门
     posName:string //岗位
+    posIds:number[] //岗位id
 }
 
 export interface RuleForm {
@@ -28,4 +29,5 @@ export interface RuleForm {
     politicalIdentity:string //政治面貌
     email:string //邮箱
     phone:string //手机号
+    posIds:number[] //岗位id
     }
