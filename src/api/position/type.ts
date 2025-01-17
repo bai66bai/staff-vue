@@ -6,3 +6,10 @@ export interface Position{
     posCode:string //岗位编码
     createTime:string //创建时间
 }
+
+export interface PostRuleForm {
+    posName:string //岗位名称
+    description:string //岗位描述
+    status:string //岗位状态
+    posCode:string //岗位编码
+}

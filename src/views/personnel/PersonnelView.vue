@@ -17,11 +17,16 @@
 
     <!-- 操作按钮 -->
     <div class="action-buttons">
-      <el-button type="primary" @click="handleAdd" plain>新增</el-button>
-      <el-button type="success" :disabled="single" @click="handleEdit" plain>修改</el-button>
-      <el-button type="danger" :disabled="multiple" @click="handleDelete" plain>删除</el-button>
+      <el-button type="primary" @click="handleAdd" plain> <el-icon style="margin-right: 5px;">
+          <Plus />
+        </el-icon> 新增</el-button>
+      <el-button type="success" :disabled="single" @click="handleEdit" plain> <el-icon style="margin-right: 5px;">
+          <Edit />
+        </el-icon> 修改</el-button>
+      <el-button type="danger" :disabled="multiple" @click="handleDelete" plain><el-icon style="margin-right: 5px;">
+          <Delete />
+        </el-icon> 删除</el-button>
     </div>
-
     <!-- 表格 -->
     <el-table :data="tableData" :header-cell-style="{ background: '#f8f8f9' }" style="width: 100% ; height: 100%;"
       @selection-change="handleSelectionChange">
@@ -89,7 +94,7 @@
       <!-- 岗位 -->
       <el-form-item label="岗位" prop="posName">
         <el-select v-model="formData.posIds" multiple placeholder="请选择岗位">
-          <el-option v-for="item in postOptions" :key="item.posId" :label="item.posName" :value="item.posId" />
+          <el-option v-for="item in postOptions" :key="item.posId" :label="item.posName" :value="item.posId" :disabled="item.status == '1'" />
         </el-select>
       </el-form-item>
 
@@ -132,7 +137,7 @@
 <script setup lang="ts">
 import { reactive, ref } from "vue";
 import { getPersonnelList, addPersonnel, deletePersonnel, selectPersonnelByUserId, updatePersonnel } from '@/api/personnel'
-import { Edit, Delete, Search, Refresh } from '@element-plus/icons-vue'
+import { Edit, Delete, Search, Refresh,Plus } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from "element-plus";
 import type { RuleForm } from "@/api/personnel/type";
 import Pagination from '@/components/Pagination/index.vue'
@@ -216,6 +221,7 @@ const title = ref('')
 interface PostOption {
   posId: number;
   posName: string;
+  status: string;
 }
 
 const postOptions = ref<PostOption[]>([]);
