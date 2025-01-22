@@ -256,7 +256,6 @@ const submitForm = async (formEl: FormInstance | undefined) => {
     if (valid) {
       //添加人员
       title.value === '添加人员信息' ? addPersonnelMsg() : updatePersonnelMsg()
-
     } else {
       console.log('error submit!', fields)
     }

@@ -114,7 +114,6 @@
 
 <script setup lang="ts">
 import { reactive, ref } from "vue";
-import {deletePersonnel } from '@/api/personnel'
 import { getPositionList , addPosition , updatePosition , selectPositionByPosId , deletePosition} from "@/api/position"
 import { Edit, Delete, Search, Refresh, Plus } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from "element-plus"
@@ -220,11 +219,16 @@ const formData = reactive<PostRuleForm>({
 
 //添加岗位信息
 const addPositionMsg = async () => {
-    console.log(formData);
     const result = await addPosition(formData)
-    ElMessage.success(result.data.msg ? result.data.msg : '岗位添加成功')
+
+    if(result.data.status !== 200){
+        ElMessage.error(result.data.msg ? result.data.msg : '岗位添加失败')
+    }else{
+        ElMessage.success('岗位添加成功')
     //刷新页面
     getPositionAllList();
+    }
+    
     dialogFormVisible.value = false
 }
 //提交表单
@@ -253,8 +257,6 @@ const handleEdit = async (row: { posId: number }) => {
     
     Object.assign(formData, data.data)
     console.log(formData);
-    
-
 };
 
 
@@ -289,10 +291,11 @@ const rules = reactive<FormRules<PostRuleForm>>({
 })
 
 
-// 删除人员模块
+// 删除岗位信息
 const handleDelete = (row: { posId: number }) => {
+    const posId: number | any[] = row.posId || ids.value
     ElMessageBox.confirm(
-        '你确定要删除吗?',
+        '你确定要删除岗位编号为"' + posId + '"的数据吗?',
         '提示',
         {
             confirmButtonText: '确定',
@@ -300,16 +303,20 @@ const handleDelete = (row: { posId: number }) => {
             type: 'warning',
         }
     )
-        .then(async () => {
-            const posId: number | any[] = row.posId || ids.value
+        .then(async () => {    
             //调用接口
-            await deletePosition(posId)
+           const result =  await deletePosition(posId)
+
+           if(result.data.status == 200){
             ElMessage({
                 type: 'success',
                 message: '删除成功',
             })
             //刷新列表
             getPositionAllList();
+           } else{
+            ElMessage.error(result.data.msg ? result.data.msg : '删除失败')
+           }
         })
         .catch(() => {
             ElMessage({
