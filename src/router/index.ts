@@ -13,7 +13,7 @@ const routes =[
           component:()=> import('@/views/position/PositionView.vue')
         },
         {path:'/profile',
-          component:()=> import('@/views/profile/Profile.vue')
+          component:()=> import('@/views/profile/index.vue')
         }
   ]},
   {

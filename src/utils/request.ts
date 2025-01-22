@@ -20,7 +20,7 @@ axios.defaults.withCredentials = true;
 service.interceptors.request.use(
 
   (config) => {
-    if (config.url === '/auth/login') { 
+    if (config.url === '/login') { 
       config.headers["Service"] = 'staff'
       return config
      }
