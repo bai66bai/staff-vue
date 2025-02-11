@@ -4,7 +4,7 @@ import type { Position, PostRuleForm } from './type'
 //岗位查询列表
 export const getPositionList = (pageNum:number, pageSize:number , posName?:string , posCode?:string , status?:string):ResponsePromise<PageInfo<Position>> => {
     return request({
-        url: '/position/list',
+        url: '/staff/position/list',
         method:"GET",
         params:{
             pageNum,
@@ -21,7 +21,7 @@ export const getPositionList = (pageNum:number, pageSize:number , posName?:strin
 export const addPosition = (formDate:PostRuleForm):ResponsePromise<string> =>{
 
     return request({
-        url: '/position/add',
+        url: '/staff/position/add',
         method:"POST",
         data:formDate
     })
@@ -32,7 +32,7 @@ export const addPosition = (formDate:PostRuleForm):ResponsePromise<string> =>{
 
 export const updatePosition = (formDate:PostRuleForm):ResponsePromise<string> =>{
     return request({
-        url: '/position/update',
+        url: '/staff/position/update',
         method:"PUT",
         data:formDate
     })
@@ -41,7 +41,7 @@ export const updatePosition = (formDate:PostRuleForm):ResponsePromise<string> =>
 //根据岗位ID查询岗位信息
 export const selectPositionByPosId = (posId?:number):ResponsePromise<PostRuleForm>=>{
     return request({
-        url : '/position/' + posId,
+        url : '/staff/position/' + posId,
         method:"GET"
     })
 }
@@ -49,7 +49,7 @@ export const selectPositionByPosId = (posId?:number):ResponsePromise<PostRuleFor
 //删除岗位信息
 export const deletePosition = (posId:number | any[]):ResponsePromise<string> =>{
     return request({
-        url: '/position/' + posId,
+        url: '/staff/position/' + posId,
         method:"DELETE"
     })
 }

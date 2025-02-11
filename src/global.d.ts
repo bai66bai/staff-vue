@@ -30,3 +30,30 @@ declare interface PageInfo<T extends Object = Object> {
     rows            :T[]         //数据
 }
 
+declare interface RouteRecordWhale extends RouteRecordRaw {
+    permission?: string[]
+    role?: string[]
+  }
+  
+  /**
+   * 路由信息
+   */
+  declare interface Routes {
+    component?: RouteRecordWhale | string | Component | RouteRecordRaw
+    hidden: boolean
+    path: string
+    children?: Routes[]
+    alwaysShow?: boolean
+    meta?: RoutesMeta
+    name?: string
+    redirect?: string
+  }
+  
+  /**
+   * 路由元信息
+   */
+  declare interface RoutesMeta {
+    link: string
+    noCache: boolean
+    title: string
+  }

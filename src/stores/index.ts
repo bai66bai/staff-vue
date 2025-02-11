@@ -1,4 +1,4 @@
-import useSysUserStore from './sysUser';
+import {useSysUserStore} from './sysUser';
 
 export default function useStore() {
     return {

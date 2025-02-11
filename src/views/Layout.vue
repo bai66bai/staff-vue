@@ -63,18 +63,15 @@
 import { Avatar, User, SwitchButton, CaretBottom, Postcard } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import avatar from '@/assets/default.png'
-import useStore from '@/store'
+import useStore from '@/stores'
 import { storeToRefs } from 'pinia';
 import { ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { logout } from '@/api/personnel';
-
 
 //pinia
-const store = useStore();
 const route = useRoute();
 const router = useRouter();
-const sysUserStore = store.sysUser
+const sysUserStore = useStore().sysUser
 const { sysUserName } = storeToRefs(sysUserStore);
 
 const activeMenu = ref(route.path);
@@ -107,8 +104,7 @@ const LogOut = () => {
     )
         .then(async () => {
             try {
-                await handleLogout();
-                redirectToLogin();
+                sysUserStore.Logout({ sendRequest: true, routeLogin: true })
             } catch (error) {
                 console.error('登出失败:', error);
                 ElMessage({
@@ -123,23 +119,6 @@ const LogOut = () => {
                 message: '取消退出',
             });
         });
-};
-
-
-// 封装登出逻辑
-const handleLogout = async () => {
-    await logout(); // 调用后端登出接口
-    sysUserStore.logout(); // 清除用户状态
-    ElMessage({
-        type: 'success',
-        message: '已退出登录',
-    });
-};
-
-
-// 封装路由跳转逻辑
-const redirectToLogin = () => {
-    router.push('/login'); // 跳转到登录页面
 };
 
 

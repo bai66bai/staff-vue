@@ -11,7 +11,7 @@
 
                     <div>
                         <div class="text-center">
-                            <userAvatar />
+                            <UserAvatar />
                         </div>
                         <ul class="list-group list-group-striped">
                             <li class="list-group-item">
@@ -55,7 +55,7 @@
                             <!-- <userInfo :user="user" /> -->
                         </el-tab-pane>
                         <el-tab-pane label="修改密码" name="resetPwd">
-                            <resetPwd />
+                            <ResetPwd />
                         </el-tab-pane>
                     </el-tabs>
                 </el-card>
@@ -67,6 +67,8 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { Calendar, UserFilled, Message, Iphone } from '@element-plus/icons-vue'
+import UserAvatar from '@/views/profile/userAvatar.vue'
+import ResetPwd from '@/views/profile/resetPwd.vue'
 
 const activeTab = ref<string>('userinfo')
 
@@ -78,7 +80,9 @@ const activeTab = ref<string>('userinfo')
 <style scoped>
 .app-container {
 
-
+    .text-center{
+        text-align: center;
+    }
     .list-group {
         padding: 0;
         margin: 0;

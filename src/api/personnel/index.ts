@@ -5,7 +5,7 @@ import type { Personnel , RuleForm } from './type'
 export const getPersonnelList = (pageNum:number, pageSize:number , username?:string):ResponsePromise<PageInfo<Personnel>> => {
     
     return  request({
-        url: '/user/list',
+        url: '/staff/user/list',
         method:"GET",
         params:{
             pageNum,
@@ -20,7 +20,7 @@ export const getPersonnelList = (pageNum:number, pageSize:number , username?:str
 export const addPersonnel = (formDate:RuleForm):ResponsePromise<string> =>{
 
     return request({
-        url: '/user/add',
+        url: '/staff/user/add',
         method:"POST",
         data:formDate
     })
@@ -30,14 +30,14 @@ export const addPersonnel = (formDate:RuleForm):ResponsePromise<string> =>{
 //删除人员信息
 export const deletePersonnel = (userId:number | any[]):ResponsePromise<string> =>{
     return request({
-        url: '/user/' + userId,
+        url: '/staff/user/' + userId,
         method:"DELETE"
     })
 }
 
 //根据id查询人员信息
 export const selectPersonnelByUserId = (userId?:number):ResponsePromise<RuleForm>=>{
-    const url = userId ? '/user/' + userId : '/user'
+    const url = userId ? '/staff/user/' + userId : '/staff/user'
     return request({
         url,
         method:"GET"
@@ -48,7 +48,7 @@ export const selectPersonnelByUserId = (userId?:number):ResponsePromise<RuleForm
 //修改人员信xi
 export const updatePersonnel = (formDate:RuleForm):ResponsePromise<string> =>{
     return request({
-        url: '/user/update',
+        url: '/staff/user/update',
         method:"PUT",
         data:formDate
     })
@@ -57,7 +57,18 @@ export const updatePersonnel = (formDate:RuleForm):ResponsePromise<string> =>{
 //退出登录
 export const logout = ():ResponsePromise<string> =>{
     return request({
-        url: '/user/logout',
+        url: '/staff/user/logout',
         method:"POST"
+    })
+}
+
+
+//上传头像
+export const uploadAvatar = (data:any):ResponsePromise<string> =>{
+    return request({
+        url: '/staff/profile/avatar',
+        method:"POST",
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        data:data
     })
 }

@@ -1,15 +1,12 @@
 import router from '@/router';
-import useStore from '@/store';
+import useStore from '@/stores';
 import axios, { type AxiosResponse } from 'axios';
 import { ElMessage } from 'element-plus';
-import { storeToRefs } from 'pinia';
+import { getToken } from '@/utils/auth';
 
-
-//定义一个变量,记录公共的前缀  ,  baseURL
-//const baseURL = 'http://localhost:8080';
- const baseURL = '/api';
 const service = axios.create({
-  baseURL,
+  //将环境变量中的VITE_BASE_URL赋值给baseURL
+  baseURL: import.meta.env.VITE_BASE_URL,
   timeout: 30 * 1000
 })
 
@@ -20,18 +17,9 @@ axios.defaults.withCredentials = true;
 service.interceptors.request.use(
 
   (config) => {
-    if (config.url === '/login') { 
-      config.headers["Service"] = 'staff'
-      return config
-     }
-
-    // pinia
-    const sysUserStore = useStore().sysUser;
-    const { token } = storeToRefs(sysUserStore);
-
+    config.headers["Service"] = import.meta.env.VITE_BASE_SERVICE_NAME
     if (!config.headers) { throw new Error(`config不能为空`) }
-
-    config.headers.Authorization = "Bearer " + token.value
+    config.headers["Authorization"] = getToken()    
     return config
 
   },
@@ -57,7 +45,7 @@ service.interceptors.response.use(
   (error: any) => {
 
     if (error instanceof Object && error.hasOwnProperty('response')) {
-      
+
       if (error.response.status === 401) {
         router.push('/login');
         ElMessage({
