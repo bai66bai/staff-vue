@@ -10,13 +10,13 @@
   
   </script>
   
-  <!-- <style lang="scss" scoped>
+  <style lang="scss" scoped>
   #notfound-main {
     text-align: center;
     user-select: none;
     height: 100%;
-    background-color: $wr-main-color;
-    color: $wr-font-color;
+    background-color: #ffc600;
+    color: #1a1a1a;
     font-size: 100%;
     line-height: 1.5;
     font-family: "Roboto", sans-serif;
@@ -40,10 +40,10 @@
   
     a {
       font-weight: 300;
-      color: $wr-font-color;
+      color: #1a1a1a;
       font-size: 1.5em;
       text-decoration: none;
-      border: 1px solid $wr-font-color;
+      border: 1px solid #1a1a1a;
       padding: .7em;
       letter-spacing: .5rem;
       border-radius: 3px;
@@ -51,10 +51,10 @@
   
       &:hover {
         background-color: #cc9e00;
-        color: $wr-font-color;
+        color: #1a1a1a;
       }
     }
   
   }
-  </style> -->
+  </style>
   

@@ -131,8 +131,8 @@ const beforeUpload = (File:File) => {
   }else{
     const reader = new FileReader();
     reader.readAsDataURL(File);
-    reader.onload = (e) => {
-      options.value.img = e.target?.result as string;
+    reader.onload = () => {
+      options.value.img = reader.result as string;
       options.value.filename = File.name;
     };
   }
@@ -141,7 +141,7 @@ const beforeUpload = (File:File) => {
 //上传图片
 
 const uploadImg = () => {
-  cropper.value.getCropData((data: any) => {
+  cropper.value.getCropBlob((data: any) => {    
     let formData = new FormData();
     formData.append("avatarfile", data, options.value.filename);
     uploadAvatar(formData).then(res => {
