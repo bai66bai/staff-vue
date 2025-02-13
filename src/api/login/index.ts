@@ -11,8 +11,7 @@ export const userLogin = (form:LoginForm):ResponsePromise<responseSource> =>{
 
 export async function getInfo(): ResponsePromise<UserInfo> {
     return request({
-    //TODO：路径接口待定
-      url: '/user/auth/getInfo',
+      url: '/staff/user/getInfo',
       method: 'GET',
     })
   }

@@ -135,7 +135,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from "vue";
+import { onMounted, reactive, ref } from "vue";
 import { getPersonnelList, addPersonnel, deletePersonnel, selectPersonnelByUserId, updatePersonnel } from '@/api/personnel'
 import { Edit, Delete, Search, Refresh,Plus } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from "element-plus";
@@ -179,8 +179,9 @@ const getPersonnelAllList = async () => {
 
 }
 
-getPersonnelAllList();
-
+onMounted(() => {
+  getPersonnelAllList();
+});
 
 // 搜索逻辑
 const handleSearch = () => {

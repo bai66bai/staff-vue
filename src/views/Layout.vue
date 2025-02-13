@@ -6,32 +6,18 @@
             <div class="el-aside__logo"></div>
             <!-- 菜单标签 -->
             <el-menu active-text-color="#ffd04b" background-color="#344156" text-color="#fff"
-                :default-active="activeMenu" router>
-                <el-menu-item index="/personnel">
-                    <el-icon>
-                        <User />
-                    </el-icon>
-                    <span>人员管理</span>
-                </el-menu-item>
-                <el-menu-item index="/position">
-                    <el-icon>
-                        <Postcard />
-                    </el-icon>
-                    <span>岗位管理</span>
-                </el-menu-item>
-                <el-menu-item index="/profile">
-                    <el-icon>
-                        <Avatar />
-                    </el-icon>
-                    <span>个人中心</span>
-                </el-menu-item>
+                :default-active="activeMenu">
+                <div id="side-items">
+                    <SideBearItemView v-for="item in sidebarRouters" :key="item.path" :item="item" :basePath="item.path" />
+                </div>
+            
             </el-menu>
         </el-aside>
         <!-- 右侧主区域 -->
         <el-container>
             <!-- 头部区域 -->
             <el-header>
-                <div>当前登录：<strong>{{ sysUserName }}</strong></div>
+                <div>当前登录：<strong>{{ sysUserStore.name }}</strong></div>
                 <el-dropdown @command="handleCommand" placement="bottom-end">
                     <span class="el-dropdown__box">
                         <el-avatar :src="avatar" />
@@ -64,18 +50,20 @@ import { Avatar, User, SwitchButton, CaretBottom, Postcard } from '@element-plus
 import { ElMessage, ElMessageBox } from 'element-plus'
 import avatar from '@/assets/default.png'
 import useStore from '@/stores'
-import { storeToRefs } from 'pinia';
 import { ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { computed } from 'vue';
+import SideBearItemView from '@/components/SideBearItemView.vue';
 
 //pinia
 const route = useRoute();
 const router = useRouter();
 const sysUserStore = useStore().sysUser
-const { sysUserName } = storeToRefs(sysUserStore);
+const settingsStore = useStore().settings;
+const permissionStore = useStore().permission;
 
-const activeMenu = ref(route.path);
-
+const sidebarRouters = computed(() => permissionStore.routeRecord.sidebarRouters);
+const activeMenu = computed(() => settingsStore.currentRoute);
 
 // 监听路由变化，更新选中项
 watch(() => route.path, (newPath) => {
@@ -179,7 +167,10 @@ const LogOut = () => {
             }
         }
     }
-
+    #side-items {
+    height: calc(100% - 1rem);
+    padding-top: 1rem;
+  }
     .el-footer {
         display: flex;
         align-items: center;

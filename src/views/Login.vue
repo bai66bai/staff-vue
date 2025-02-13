@@ -19,8 +19,9 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { ref ,watch } from 'vue';
 import { ElMessage } from 'element-plus';
+import type { LocationQuery, LocationQueryValue } from 'vue-router';
 import { useRouter } from 'vue-router';
 import type { LoginForm } from '@/api/login/type';
 import { userLogin } from '@/api/login'
@@ -47,6 +48,13 @@ const rules = {
   ]
 };
 
+const redirect = ref<LocationQuery | LocationQueryValue | LocationQueryValue[]>()
+const route = router.currentRoute
+watch(route, () => {
+  redirect.value = route.value.query && route.value.query.redirect
+}, { immediate: true })
+
+
 const onSubmit = async () => {
   await formRef.value?.validate(async (valid: boolean) => {
     if (valid) {
@@ -57,10 +65,10 @@ const onSubmit = async () => {
         //将当前用户信息存入缓存
         setToken(result.data.data.access_token)
         useStore().sysUser.SET_TOKEN(result.data.data.access_token)
-        router.push({ path: '/personnel' })
+        router.push({ path: redirect.value as string || '/' })
         ElMessage.success('登录成功');
       } else {
-        ElMessage.error("登陆失败")
+        ElMessage.error(result.data.msg? result.data.msg : "登陆失败");
       };
 
 

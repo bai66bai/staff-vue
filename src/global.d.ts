@@ -1,5 +1,4 @@
 /** 全局类型定义 */
-
 /** 后端返回数据格式 */
 declare interface ResponseRecord<T> {
     data    :T

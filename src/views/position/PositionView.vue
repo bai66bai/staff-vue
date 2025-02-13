@@ -113,8 +113,8 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from "vue";
-import { getPositionList , addPosition , updatePosition , selectPositionByPosId , deletePosition} from "@/api/position"
+import { onMounted, reactive, ref } from "vue";
+import { getPositionList, addPosition, updatePosition, selectPositionByPosId, deletePosition } from "@/api/position"
 import { Edit, Delete, Search, Refresh, Plus } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from "element-plus"
 import type { PostRuleForm } from "@/api/position/type"
@@ -171,8 +171,10 @@ async function getPositionAllList() {
     pagination.total = result.data.data.total;
 }
 
-getPositionAllList();
-
+//页面加载时获取数据
+onMounted(() => {
+    getPositionAllList();
+});
 
 // 搜索逻辑
 const handleSearch = () => {
@@ -221,14 +223,14 @@ const formData = reactive<PostRuleForm>({
 const addPositionMsg = async () => {
     const result = await addPosition(formData)
 
-    if(result.data.status !== 200){
+    if (result.data.status !== 200) {
         ElMessage.error(result.data.msg ? result.data.msg : '岗位添加失败')
-    }else{
+    } else {
         ElMessage.success('岗位添加成功')
-    //刷新页面
-    getPositionAllList();
+        //刷新页面
+        getPositionAllList();
     }
-    
+
     dialogFormVisible.value = false
 }
 //提交表单
@@ -254,7 +256,7 @@ const handleEdit = async (row: { posId: number }) => {
     const posId: number = row.posId || ids.value[0]
     const { data } = await selectPositionByPosId(posId);
     console.log(data);
-    
+
     Object.assign(formData, data.data)
     console.log(formData);
 };
@@ -303,20 +305,20 @@ const handleDelete = (row: { posId: number }) => {
             type: 'warning',
         }
     )
-        .then(async () => {    
+        .then(async () => {
             //调用接口
-           const result =  await deletePosition(posId)
+            const result = await deletePosition(posId)
 
-           if(result.data.status == 200){
-            ElMessage({
-                type: 'success',
-                message: '删除成功',
-            })
-            //刷新列表
-            getPositionAllList();
-           } else{
-            ElMessage.error(result.data.msg ? result.data.msg : '删除失败')
-           }
+            if (result.data.status == 200) {
+                ElMessage({
+                    type: 'success',
+                    message: '删除成功',
+                })
+                //刷新列表
+                getPositionAllList();
+            } else {
+                ElMessage.error(result.data.msg ? result.data.msg : '删除失败')
+            }
         })
         .catch(() => {
             ElMessage({

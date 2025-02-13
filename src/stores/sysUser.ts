@@ -4,6 +4,7 @@ import { setToken, removeToken, getToken } from '@/utils/auth'
 import { logout } from '@/api/personnel';
 import { getInfo } from '@/api/login';
 import router from '@/router';
+import { usePermiStore } from './permission';
 
 export const useSysUserStore = defineStore('sysUser', () => {
 
@@ -68,6 +69,13 @@ async function GetInfo() {
     SET_TOKEN('')
     SET_ROLES([])
     SET_PERMISSIONS([])
+
+    const { SET_ROUTES ,SET_DEFAULT_ROUTES, SET_SIDEBAR_ROUTERS, SET_TOPBAR_ROUTES } = usePermiStore()
+    SET_ROUTES([])
+    SET_DEFAULT_ROUTES([])
+    SET_SIDEBAR_ROUTERS([])
+    SET_TOPBAR_ROUTES([])
+
     removeToken()
     if (routeLogin) router.push('/login')
   }
