@@ -1,5 +1,5 @@
 import request from '@/utils/request'
-import type { Personnel , RuleForm } from './type'
+import type { Profile, Personnel , RuleForm } from './type'
 
 //人员列表查询
 export const getPersonnelList = (pageNum:number, pageSize:number , username?:string):ResponsePromise<PageInfo<Personnel>> => {
@@ -57,7 +57,7 @@ export const updatePersonnel = (formDate:RuleForm):ResponsePromise<string> =>{
 //退出登录
 export const logout = ():ResponsePromise<string> =>{
     return request({
-        url: '/staff/user/logout',
+        url: '/logout',
         method:"POST"
     })
 }
@@ -70,5 +70,24 @@ export const uploadAvatar = (data:any):ResponsePromise<string> =>{
         method:"POST",
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         data:data
+    })
+}
+
+
+//查询个人信息
+export const getProfile = ():ResponsePromise<Profile> =>{
+    return request({
+        url: '/staff/user/profile',
+        method:"GET"
+    })
+}
+
+
+//修改个人信息
+export const updateProfile = (formDate:Profile):ResponsePromise<string> =>{
+    return request({
+        url: '/staff/user/profile',
+        method:"PUT",
+        data:formDate
     })
 }

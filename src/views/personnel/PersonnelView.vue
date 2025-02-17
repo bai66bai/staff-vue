@@ -77,7 +77,7 @@
       <el-form-item label="性别" prop="gender">
         <el-radio-group v-model="formData.gender">
           <el-radio :label="1">男</el-radio>
-          <el-radio :label="2">女</el-radio>
+          <el-radio :label="0">女</el-radio>
         </el-radio-group>
       </el-form-item>
 
@@ -94,7 +94,8 @@
       <!-- 岗位 -->
       <el-form-item label="岗位" prop="posName">
         <el-select v-model="formData.posIds" multiple placeholder="请选择岗位">
-          <el-option v-for="item in postOptions" :key="item.posId" :label="item.posName" :value="item.posId" :disabled="item.status == '1'" />
+          <el-option v-for="item in postOptions" :key="item.posId" :label="item.posName" :value="item.posId"
+            :disabled="item.status == '1'" />
         </el-select>
       </el-form-item>
 
@@ -137,7 +138,7 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from "vue";
 import { getPersonnelList, addPersonnel, deletePersonnel, selectPersonnelByUserId, updatePersonnel } from '@/api/personnel'
-import { Edit, Delete, Search, Refresh,Plus } from '@element-plus/icons-vue'
+import { Edit, Delete, Search, Refresh, Plus } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from "element-plus";
 import type { RuleForm } from "@/api/personnel/type";
 import Pagination from '@/components/Pagination/index.vue'

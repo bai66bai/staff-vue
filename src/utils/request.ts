@@ -29,6 +29,10 @@ request.interceptors.request.use(
   }
 );
 
+//响应拦截器
+
+let isTokenExpiredModalVisible = false
+
 request.interceptors.response.use(
   (response) => {
     return response
@@ -45,27 +49,35 @@ request.interceptors.response.use(
           })
           return Promise.reject(error)
         }
-
-        const boxRet = await ElMessageBox.confirm(
-          '登录状态已过期，您可以继续留在该页面，或者重新登录',
-          '系统提示',
-          {
-            confirmButtonText: '重新登录',
-            cancelButtonText: '取消',
-            type: 'warning',
-          },
-        )
-        if (boxRet === 'confirm') {
-          const store = useStore()
-          const userStore = store.sysUser
-          await userStore.Logout({
-            sendRequest: false,
-            routeLogin: true,
-          })
-
-          const settingsStore = store.settings
-          router.push(`/login?redirect=${settingsStore.currentRoute}`)
+        if(!isTokenExpiredModalVisible){
+          isTokenExpiredModalVisible = true
+          try{
+            const boxRet = await ElMessageBox.confirm(
+              '登录状态已过期，您可以继续留在该页面，或者重新登录',
+              '系统提示',
+              {
+                confirmButtonText: '重新登录',
+                cancelButtonText: '取消',
+                type: 'warning',
+              },
+            )
+            if (boxRet === 'confirm') {
+              const store = useStore()
+              const userStore = store.sysUser
+              await userStore.Logout({
+                sendRequest: false,
+                routeLogin: true,
+              })
+    
+              const settingsStore = store.settings
+              router.push(`/login?redirect=${settingsStore.currentRoute}`)
+            }
+          } finally {
+            isTokenExpiredModalVisible = false
+          }
+          return Promise.reject(error)
         }
+        return Promise.reject(error)
       }
 
       const msg = errCodeMap.get(error.response.status) || '网络出现问题'
@@ -73,8 +85,6 @@ request.interceptors.response.use(
         message: `[${msg}]\n${error.response.data.msg}`,
         showClose: true,
       })
-
-      return Promise.reject(error)
     }
     return Promise.reject(error)
   },

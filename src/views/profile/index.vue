@@ -18,25 +18,25 @@
                                 <el-icon>
                                     <UserFilled />
                                 </el-icon>用户名称
-                                <div class="pull-right">admin</div>
+                                <div class="pull-right">{{user.username}}</div>
                             </li>
                             <li class="list-group-item">
                                 <el-icon>
                                     <Iphone />
                                 </el-icon>手机号码
-                                <div class="pull-right">15888888888</div>
+                                <div class="pull-right">{{user.phone}}</div>
                             </li>
                             <li class="list-group-item">
                                 <el-icon>
                                     <Message />
                                 </el-icon>用户邮箱
-                                <div class="pull-right">135555555@163.com</div>
+                                <div class="pull-right">{{user.email}}</div>
                             </li>
                             <li class="list-group-item">
                                 <el-icon>
                                     <Calendar />
                                 </el-icon>创建日期
-                                <div class="pull-right">2025-01-22 12:31:35</div>
+                                <div class="pull-right">{{user.createdTime}}</div>
                             </li>
                         </ul>
                     </div>
@@ -52,7 +52,7 @@
 
                     <el-tabs v-model="activeTab">
                         <el-tab-pane label="基本资料" name="userinfo">
-                            <!-- <userInfo :user="user" /> -->
+                            <UserInfo :user="user"  @update:user="user = $event" />
                         </el-tab-pane>
                         <el-tab-pane label="修改密码" name="resetPwd">
                             <ResetPwd />
@@ -65,12 +65,36 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref , onMounted } from 'vue';
 import { Calendar, UserFilled, Message, Iphone } from '@element-plus/icons-vue'
 import UserAvatar from '@/views/profile/userAvatar.vue'
 import ResetPwd from '@/views/profile/resetPwd.vue'
-
+import UserInfo from '@/views/profile/userInfo.vue'
+import { getProfile } from '@/api/personnel'
 const activeTab = ref<string>('userinfo')
+
+const user = ref({
+    userId: null as number | null,
+    nickName: '',
+    phone: '',
+    email: '',
+    gender: '0',
+    username:'',
+    createdTime: ''
+})
+
+
+onMounted(() => {
+    getProfileInfo();
+});
+
+
+//获取个人信息
+const getProfileInfo = async () =>{
+    const result = await getProfile()
+    user.value = result.data.data
+}
+
 
 </script>
 

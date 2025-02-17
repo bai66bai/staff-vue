@@ -31,3 +31,13 @@ export interface RuleForm {
     phone:string //手机号
     posIds:number[] //岗位id
     }
+
+    export  interface Profile {
+        userId: number|null
+        nickName: string
+        phone: string
+        email: string
+        gender: string
+        username: string
+        createdTime: string
+      }
