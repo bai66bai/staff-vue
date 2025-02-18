@@ -30,25 +30,28 @@
     <!-- 表格 -->
     <el-table :data="tableData" :header-cell-style="{ background: '#f8f8f9' }" style="width: 100% ; height: 100%;"
       @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" />
-      <el-table-column fixed prop="userId" label="用户编号" width="150" />
-      <el-table-column prop="username" label="用户名" />
-      <el-table-column prop="nickName" label="用户昵称" />
-      <el-table-column prop="deptName" label="部门" />
-      <el-table-column prop="phone" label="手机号" />
-      <el-table-column prop="createdTime" label="创建时间">
+      <el-table-column align="center" type="selection" width="55" />
+      <el-table-column align="center" fixed prop="userId" label="用户编号" width="150" />
+      <el-table-column align="center" prop="username" label="用户名" />
+      <el-table-column align="center" prop="nickName" label="用户昵称" />
+      <el-table-column align="center" prop="deptName" label="部门" />
+      <el-table-column align="center" prop="phone" label="手机号" />
+      <el-table-column align="center" prop="createdTime" label="创建时间">
         <template #default="scope">
           {{ scope.row.createdTime.toLocaleString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/, '') }}
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="150">
+      <el-table-column align="center" label="操作" width="230">
         <template #default="scope">
           <el-link type="primary" @click="handleEdit(scope.row)"><el-icon>
               <Edit />
             </el-icon>修改</el-link>
-          <el-link type="danger" @click="handleDelete(scope.row)"><el-icon>
+          <el-link type="primary" @click="handleDelete(scope.row)"><el-icon>
               <Delete />
             </el-icon>删除</el-link>
+          <el-link type="primary" @click="handleResetPwd(scope.row)"><el-icon>
+              <Key />
+            </el-icon>重置密码</el-link>
         </template>
       </el-table-column>
     </el-table>
@@ -76,8 +79,8 @@
       <!-- 性别 -->
       <el-form-item label="性别" prop="gender">
         <el-radio-group v-model="formData.gender">
-          <el-radio :label="1">男</el-radio>
-          <el-radio :label="0">女</el-radio>
+          <el-radio :value="1">男</el-radio>
+          <el-radio :value="0">女</el-radio>
         </el-radio-group>
       </el-form-item>
 
@@ -137,8 +140,8 @@
 
 <script setup lang="ts">
 import { onMounted, reactive, ref } from "vue";
-import { getPersonnelList, addPersonnel, deletePersonnel, selectPersonnelByUserId, updatePersonnel } from '@/api/personnel'
-import { Edit, Delete, Search, Refresh, Plus } from '@element-plus/icons-vue'
+import { getPersonnelList, addPersonnel, deletePersonnel, selectPersonnelByUserId, updatePersonnel, resetPassword } from '@/api/personnel'
+import { Edit, Delete, Search, Refresh, Plus, Key } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from "element-plus";
 import type { RuleForm } from "@/api/personnel/type";
 import Pagination from '@/components/Pagination/index.vue'
@@ -272,10 +275,11 @@ const updatePersonnelMsg = async () => {
     ElMessage.error(result.data.msg ? result.data.msg : '修改失败')
   } else {
     ElMessage.success('修改成功')
+     //刷新页面
+  getPersonnelAllList();
   }
 
-  //刷新页面
-  getPersonnelAllList();
+ 
   dialogFormVisible.value = false
 }
 
@@ -324,8 +328,9 @@ const rules = reactive<FormRules<RuleForm>>({
 
 // 删除人员模块
 const handleDelete = (row: { userId: number }) => {
+  const userId: number | any[] = row.userId || ids.value
   ElMessageBox.confirm(
-    '你确定要删除吗?',
+    '你确定要删除ID为”' + userId + '” 的人员吗?',
     '提示',
     {
       confirmButtonText: '确定',
@@ -334,24 +339,64 @@ const handleDelete = (row: { userId: number }) => {
     }
   )
     .then(async () => {
-      const userId: number | any[] = row.userId || ids.value
       //调用接口
       const result = await deletePersonnel(userId)
-
-      ElMessage({
-        type: 'success',
-        message: '删除成功',
-      })
-      //刷新列表
-      getPersonnelAllList();
+      console.log(result);
+      if (result.data.status !== 200) {
+        ElMessage.error(result.data.msg ? result.data.msg : '删除失败')
+      } else {
+        ElMessage({
+          type: 'success',
+          message: '删除成功',
+        })
+        //刷新列表
+        getPersonnelAllList();
+      }
     })
-    .catch(() => {
-      ElMessage({
-        type: 'info',
-        message: '取消删除',
-      })
+    .catch((e) => {
+      if (e == 'cancel') {
+        ElMessage({
+          type: 'info',
+          message: '取消删除',
+        })
+      }
     })
 };
+
+//重置人员密码模块
+const handleResetPwd = (row: { userId: number }) => {
+  ElMessageBox.confirm(
+    '你确定要重置ID为 ' + row.userId + ' 的密码吗?',
+    '提示',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
+    }
+  )
+    .then(async () => {
+      const userId: number = row.userId
+      //调用接口
+      const result = await resetPassword(userId)
+      if (result.data.status !== 200) {
+        ElMessage.error(result.data.msg ? result.data.msg : '重置失败')
+      } else {
+        ElMessage({
+          type: 'success',
+          message: '重置成功',
+        })
+      }
+    })
+    .catch((e) => {
+      if (e == 'cancel') {
+        ElMessage({
+          type: 'info',
+          message: '取消重置',
+        })
+      }
+    })
+};
+
 
 //点击修改查询数据通过 UserId查询数据 回显
 const handleEdit = async (row: { userId: number }) => {
@@ -362,7 +407,6 @@ const handleEdit = async (row: { userId: number }) => {
   const { data } = await selectPersonnelByUserId(userId);
   postOptions.value = data.data.posts;
   Object.assign(formData, data.data.data)
-
 };
 
 </script>

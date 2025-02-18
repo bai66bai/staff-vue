@@ -8,30 +8,20 @@
             <el-menu active-text-color="#ffd04b" background-color="#344156" text-color="#fff"
                 :default-active="activeMenu">
                 <div id="side-items">
-                    <SideBearItemView v-for="item in sidebarRouters" :key="item.path" :item="item" :basePath="item.path" />
+                    <SideBearItemView v-for="item in sidebarRouters" :key="item.path" :item="item"
+                        :basePath="item.path" />
                 </div>
-            
+
             </el-menu>
         </el-aside>
         <!-- 右侧主区域 -->
         <el-container>
             <!-- 头部区域 -->
             <el-header>
-                <div>当前登录：<strong>{{ sysUserStore.name }}</strong></div>
-                <el-dropdown @command="handleCommand" placement="bottom-end">
-                    <span class="el-dropdown__box">
-                        <el-avatar :src="avatar" />
-                        <el-icon>
-                            <CaretBottom />
-                        </el-icon>
-                    </span>
-                    <template #dropdown>
-                        <el-dropdown-menu>
-                            <!-- <el-dropdown-item command="profile" :icon="User">基本资料</el-dropdown-item> -->
-                            <el-dropdown-item command="logout" :icon="SwitchButton">退出登录</el-dropdown-item>
-                        </el-dropdown-menu>
-                    </template>
-                </el-dropdown>
+                <div id="nowLogin">当前登录：<strong>{{ sysUserStore.name }}</strong></div>
+                <span id="logout" @click="LogOut">
+                    退出登录
+                </span>
             </el-header>
             <!-- 中间区域 -->
             <el-main>
@@ -46,18 +36,15 @@
 
 
 <script setup>
-import { Avatar, User, SwitchButton, CaretBottom, Postcard } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import avatar from '@/assets/default.png'
 import useStore from '@/stores'
-import { ref, watch } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { watch } from 'vue';
+import { useRoute } from 'vue-router';
 import { computed } from 'vue';
 import SideBearItemView from '@/components/SideBearItemView.vue';
 
 //pinia
 const route = useRoute();
-const router = useRouter();
 const sysUserStore = useStore().sysUser
 const settingsStore = useStore().settings;
 const permissionStore = useStore().permission;
@@ -67,16 +54,10 @@ const activeMenu = computed(() => settingsStore.currentRoute);
 
 // 监听路由变化，更新选中项
 watch(() => route.path, (newPath) => {
-    activeMenu.value = newPath;
+    settingsStore.currentRoute = newPath;
 });
 
 
-//检测下拉框的点击指令
-const handleCommand = (command) => {
-    if (command === 'logout') {
-        LogOut();
-    }
-}
 
 
 const LogOut = () => {
@@ -151,6 +132,25 @@ const LogOut = () => {
         border-bottom: 1px solid #dcdfe6;
         box-shadow: 4px 0 8px rgba(0, 0, 0, 0.1);
 
+        #logout {
+            cursor: pointer;
+            user-select: none;
+            font-size: 1.2rem;
+            line-height: 5rem;
+            font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+
+        #nowLogin{
+            user-select: none;
+            font-size: 1.2rem;
+            line-height: 5rem;
+            font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+        }
+
         /* 只在右侧添加阴影 */
         .el-dropdown__box {
             display: flex;
@@ -167,10 +167,12 @@ const LogOut = () => {
             }
         }
     }
+
     #side-items {
-    height: calc(100% - 1rem);
-    padding-top: 1rem;
-  }
+        height: calc(100% - 1rem);
+        padding-top: 1rem;
+    }
+
     .el-footer {
         display: flex;
         align-items: center;

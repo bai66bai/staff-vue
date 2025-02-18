@@ -40,11 +40,11 @@
         <!-- 表格 -->
         <el-table :data="tableData" :header-cell-style="{ background: '#f8f8f9' }" style="width: 100% ; height: 100%;"
             @selection-change="handleSelectionChange">
-            <el-table-column type="selection" width="55" />
-            <el-table-column fixed prop="posId" label="岗位编号" />
-            <el-table-column prop="posCode" label="岗位编码" />
-            <el-table-column prop="posName" label="岗位名称" />
-            <el-table-column prop="status" label="岗位状态">
+            <el-table-column align="center" type="selection" width="55" />
+            <el-table-column align="center" fixed prop="posId" label="岗位编号" />
+            <el-table-column align="center" prop="posCode" label="岗位编码" />
+            <el-table-column align="center" prop="posName" label="岗位名称" />
+            <el-table-column align="center" prop="status" label="岗位状态">
                 <template #default="scope">
                     <el-tag :type="scope.row.status == '0' ? 'primary' : 'danger'"
                         :style="{ width: '55px', height: '30px' }">
@@ -52,12 +52,12 @@
                     </el-tag>
                 </template>
             </el-table-column>
-            <el-table-column prop="createdTime" label="创建时间">
+            <el-table-column align="center" prop="createdTime" label="创建时间">
                 <template #default="scope">
                     {{ scope.row.createTime.toLocaleString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/, '') }}
                 </template>
             </el-table-column>
-            <el-table-column label="操作" width="150">
+            <el-table-column align="center" label="操作" width="150">
                 <template #default="scope">
                     <el-link type="primary" @click="handleEdit(scope.row)"><el-icon>
                             <Edit />

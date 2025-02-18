@@ -54,6 +54,17 @@ export const updatePersonnel = (formDate:RuleForm):ResponsePromise<string> =>{
     })
 }
 
+//重置人员密码变为初始值
+export const resetPassword = (userId:number):ResponsePromise<string> =>{
+    return request({
+        url: '/staff/user/resetPwd/' + userId,
+        method:"PUT"
+    })
+}
+
+
+
+
 //退出登录
 export const logout = ():ResponsePromise<string> =>{
     return request({
@@ -89,5 +100,18 @@ export const updateProfile = (formDate:Profile):ResponsePromise<string> =>{
         url: '/staff/user/profile',
         method:"PUT",
         data:formDate
+    })
+}
+
+//用户密码修改
+export const updatePassword = (oldPassword:string, password:string):ResponsePromise<string> =>{
+    const data = {
+        oldPassword,
+        password
+    }
+    return request({
+        url: '/staff/user/updatePwd',
+        method:"PUT",
+        data : data
     })
 }

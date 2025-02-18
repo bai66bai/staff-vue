@@ -11,12 +11,12 @@
         </el-form-item>
         <el-form-item label="性别">
             <el-radio-group v-model="form.gender">
-                <el-radio :label="1">男</el-radio>
-                <el-radio :label="0">女</el-radio>
+                <el-radio :value="1">男</el-radio>
+                <el-radio :value="0">女</el-radio>
             </el-radio-group>
         </el-form-item>
         <el-form-item>
-            <el-button type="primary" size="mini" @click="submit">保存</el-button>
+            <el-button type="primary"  @click="submit">保存</el-button>
         </el-form-item>
     </el-form>
 </template>

@@ -10,9 +10,9 @@
                     </template>
 
                     <div>
-                        <div class="text-center">
+                        <!-- <div class="text-center">
                             <UserAvatar />
-                        </div>
+                        </div> -->
                         <ul class="list-group list-group-striped">
                             <li class="list-group-item">
                                 <el-icon>
@@ -36,7 +36,7 @@
                                 <el-icon>
                                     <Calendar />
                                 </el-icon>创建日期
-                                <div class="pull-right">{{user.createdTime}}</div>
+                                <div class="pull-right">{{user.createdTime.toLocaleString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/, '')}}</div>
                             </li>
                         </ul>
                     </div>
@@ -67,7 +67,6 @@
 <script setup lang="ts">
 import { ref , onMounted } from 'vue';
 import { Calendar, UserFilled, Message, Iphone } from '@element-plus/icons-vue'
-import UserAvatar from '@/views/profile/userAvatar.vue'
 import ResetPwd from '@/views/profile/resetPwd.vue'
 import UserInfo from '@/views/profile/userInfo.vue'
 import { getProfile } from '@/api/personnel'
