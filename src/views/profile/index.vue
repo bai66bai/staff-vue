@@ -1,7 +1,7 @@
 <template>
     <div class="app-container">
         <el-row :gutter="20">
-            <el-col :span="6" :xs="24">
+            <el-col :span="8" :xs="24">
                 <el-card class="box-card">
                     <template #header>
                         <div class="card-header">
@@ -19,6 +19,12 @@
                                     <UserFilled />
                                 </el-icon>用户名称
                                 <div class="pull-right">{{user.username}}</div>
+                            </li>
+                            <li class="list-group-item">
+                                <el-icon>
+                                    <CreditCard />
+                                </el-icon>员工工号
+                                <div class="pull-right">{{user.empId}}</div>
                             </li>
                             <li class="list-group-item">
                                 <el-icon>
@@ -42,7 +48,7 @@
                     </div>
                 </el-card>
             </el-col>
-            <el-col :span="18" :xs="24">
+            <el-col :span="16" :xs="24">
                 <el-card>
                     <template #header>
                         <div class="card-header">
@@ -66,7 +72,7 @@
 
 <script setup lang="ts">
 import { ref , onMounted } from 'vue';
-import { Calendar, UserFilled, Message, Iphone } from '@element-plus/icons-vue'
+import { Calendar, UserFilled, Message, Iphone ,CreditCard } from '@element-plus/icons-vue'
 import ResetPwd from '@/views/profile/resetPwd.vue'
 import UserInfo from '@/views/profile/userInfo.vue'
 import { getProfile } from '@/api/personnel'
@@ -79,7 +85,10 @@ const user = ref({
     email: '',
     gender: '0',
     username:'',
-    createdTime: ''
+    createdTime: '',
+    empId: '',
+    emergency:'',
+    emergencyPhone: ''
 })
 
 

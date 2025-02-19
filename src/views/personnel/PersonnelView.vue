@@ -5,6 +5,12 @@
       <el-form-item label="用户名称：" label-width="85px">
         <el-input v-model="searchForm.username" placeholder="请输入用户名"></el-input>
       </el-form-item>
+      <el-form-item label="用户状态：" label-width="85px">
+        <el-select v-model="searchForm.status" placeholder="请选择状态" style="width: 240px">
+          <el-option label="在职" value="0"></el-option>
+          <el-option label="离职" value="1"></el-option>
+        </el-select>
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" plain @click="handleSearch"><el-icon>
             <Search />
@@ -36,6 +42,14 @@
       <el-table-column align="center" prop="nickName" label="用户昵称" />
       <el-table-column align="center" prop="deptName" label="部门" />
       <el-table-column align="center" prop="phone" label="手机号" />
+      <el-table-column align="center" prop="status" label="状态">
+        <template #default="scope">
+                    <el-tag :type="scope.row.status == '0' ? 'primary' : 'danger'"
+                        :style="{ width: '55px', height: '30px' }">
+                        {{ scope.row.status == "0" ? '在职' : '离职' }}
+                    </el-tag>
+                </template>
+      </el-table-column>
       <el-table-column align="center" prop="createdTime" label="创建时间">
         <template #default="scope">
           {{ scope.row.createdTime.toLocaleString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/, '') }}
@@ -64,7 +78,7 @@
 
 
   <!-- 添加弹出框 -->
-  <el-dialog v-model="dialogFormVisible" :title="title" width="500" @closed="resetForm(ruleFormRef)">
+  <el-dialog v-model="dialogFormVisible" :title="title" width="50rem" @closed="resetForm(ruleFormRef)">
     <el-form ref="ruleFormRef" :model="formData" :rules="rules" label-width="120px">
       <!-- 用户名 -->
       <el-form-item label="用户名" prop="username">
@@ -84,14 +98,9 @@
         </el-radio-group>
       </el-form-item>
 
-      <!-- 入职来源 -->
-      <el-form-item label="入职来源" prop="recruitSource">
-        <el-input v-model="formData.recruitSource" placeholder="请输入入职来源" />
-      </el-form-item>
-
-      <!-- 入职时间 -->
-      <el-form-item label="入职时间" prop="entryTime">
-        <el-date-picker v-model="formData.entryTime" type="datetime" placeholder="选择入职时间" style="width: 100%;" />
+      <!-- 工号 -->
+      <el-form-item label="工号" prop="empId">
+        <el-input v-model="formData.empId" placeholder="请输入员工工号" />
       </el-form-item>
 
       <!-- 岗位 -->
@@ -101,21 +110,17 @@
             :disabled="item.status == '1'" />
         </el-select>
       </el-form-item>
+      <el-form-item label="状态" prop="status">
+        <el-radio-group v-model="formData.status">
+          <el-radio :value="'0'">在职</el-radio>
+          <el-radio :value="'1'">离职</el-radio>
+        </el-radio-group>
+      </el-form-item>
 
 
       <!-- 出生日期 -->
       <el-form-item label="出生日期" prop="birthday">
         <el-date-picker v-model="formData.birthday" type="date" placeholder="选择出生日期" style="width: 100%;" />
-      </el-form-item>
-
-      <!-- 银行账号 -->
-      <el-form-item label="银行账号" prop="bankAccount">
-        <el-input v-model="formData.bankAccount" placeholder="请输入银行账号" />
-      </el-form-item>
-
-      <!-- 政治面貌 -->
-      <el-form-item label="政治面貌" prop="politicalIdentity">
-        <el-input v-model="formData.politicalIdentity" placeholder="请输入政治面貌" />
       </el-form-item>
 
       <!-- 邮箱 -->
@@ -127,6 +132,17 @@
       <el-form-item label="手机号" prop="phone">
         <el-input v-model="formData.phone" placeholder="请输入手机号" />
       </el-form-item>
+
+      <!-- 紧急联系人 -->
+      <el-form-item label="紧急联系人" prop="emergency">
+        <el-input v-model="formData.emergency" placeholder="请输入紧急联系人" />
+      </el-form-item>
+
+      <!-- 紧急联系人电话 -->
+      <el-form-item label="紧急联系人电话" prop="emergencyPhone">
+        <el-input v-model="formData.emergencyPhone" placeholder="请输入紧急联系人电话" />
+      </el-form-item>
+
       <el-form-item>
         <el-button type="primary" @click="submitForm(ruleFormRef)">
           提交
@@ -148,7 +164,7 @@ import Pagination from '@/components/Pagination/index.vue'
 // 搜索表单
 const searchForm = reactive({
   username: "",
-  phone: "",
+  status: ""
 });
 // 分页数据
 const pagination = reactive({
@@ -177,10 +193,9 @@ const multiple = ref(true) //控制批量删除
 let tableData = ref();
 //获取人员列表数据
 const getPersonnelAllList = async () => {
-  const result = await getPersonnelList(pagination.pageNum, pagination.pageSize, searchForm.username)
+  const result = await getPersonnelList(pagination.pageNum, pagination.pageSize, searchForm.username , searchForm.status)
   tableData.value = result.data.data.rows
   pagination.total = result.data.data.total
-
 }
 
 onMounted(() => {
@@ -195,7 +210,7 @@ const handleSearch = () => {
 // 重置搜索条件
 const handleReset = () => {
   searchForm.username = "";
-  searchForm.phone = "";
+  searchForm.status = "";
   getPersonnelAllList();
 };
 
@@ -236,14 +251,14 @@ const formData = reactive<RuleForm>({
   username: '',
   nickName: '',
   gender: null,
-  recruitSource: '',
-  entryTime: null,
   birthday: null,
-  bankAccount: '',
-  politicalIdentity: '',
   email: '',
   phone: '',
-  posIds: []
+  posIds: [],
+  emergency:'',
+  emergencyPhone:'',
+  empId:'',
+  status: '0'
 })
 
 //添加人员
@@ -308,13 +323,6 @@ const rules = reactive<FormRules<RuleForm>>({
       message: "请输入有效的邮箱地址",
       trigger: "blur",
     },
-  ],
-  bankAccount: [
-    {
-      pattern: /^[1-9]\d{9,29}$/,
-      message: "请输入正确的银行卡号",
-      trigger: "blur"
-    }
   ],
   phone: [
     {

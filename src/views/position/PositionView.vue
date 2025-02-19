@@ -62,7 +62,7 @@
                     <el-link type="primary" @click="handleEdit(scope.row)"><el-icon>
                             <Edit />
                         </el-icon>修改</el-link>
-                    <el-link type="danger" @click="handleDelete(scope.row)"><el-icon>
+                    <el-link type="primary" @click="handleDelete(scope.row)"><el-icon>
                             <Delete />
                         </el-icon>删除</el-link>
                 </template>

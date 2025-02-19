@@ -1,10 +1,16 @@
 <template>
-    <el-form ref="formRef" :model="form" :rules="rules" label-width="80px">
+    <el-form ref="formRef" :model="form" :rules="rules" label-width="8rem">
         <el-form-item label="用户昵称" prop="nickName">
             <el-input v-model="form.nickName" maxlength="30" />
         </el-form-item>
         <el-form-item label="手机号码" prop="phone">
             <el-input v-model="form.phone" maxlength="11" />
+        </el-form-item>
+        <el-form-item label="紧急联系人" prop="emergency">
+            <el-input v-model="form.emergency" maxlength="11" />
+        </el-form-item>
+        <el-form-item label="紧急联系人电话" prop="emergencyPhone">
+            <el-input v-model="form.emergencyPhone" maxlength="11" />
         </el-form-item>
         <el-form-item label="邮箱" prop="email">
             <el-input v-model="form.email" maxlength="50" />
@@ -43,7 +49,10 @@ const form = reactive<Profile>({
     email: '',
     gender: '',
     username: '',
-    createdTime: ''
+    createdTime: '',
+    empId: '',
+    emergency: '',
+    emergencyPhone: ''
 })
 
 const rules = reactive({
@@ -65,6 +74,17 @@ const rules = reactive({
             message: '请输入正确的手机号码',
             trigger: 'blur'
         }
+    ],
+    emergency: [
+        { required: true, message: '紧急联系人不能为空', trigger: 'blur' }
+    ],
+    emergencyPhone: [
+        { required: true, message: '紧急联系人电话不能为空', trigger: 'blur' },
+        {
+            pattern: /^1[3|4|5|6|7|8|9][0-9]\d{8}$/,
+            message: '请输入正确的手机号码',
+            trigger: 'blur'
+        }
     ]
 })
 
@@ -75,21 +95,23 @@ watch(() => props.user, (newVal) => {
         form.email = newVal.email
         form.gender = newVal.gender
         form.userId = newVal.userId
+        form.emergency = newVal.emergency
+        form.emergencyPhone = newVal.emergencyPhone
     }
 }, { immediate: true, deep: true })
 
 const submit = () => {
     formRef.value?.validate(valid => {
         if (valid) {
-            console.log(form);
-            
             updateProfile(form).then(() => {
                 ElMessage.success('修改成功')
                 emit('update:user', {
                     ...props.user,
                     phone: form.phone,
                     email: form.email,
-                    gender: form.gender
+                    gender: form.gender,
+                    emergency: form.emergency,
+                    emergencyPhone: form.emergencyPhone
                 })
             })
         }

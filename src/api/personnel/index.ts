@@ -2,7 +2,7 @@ import request from '@/utils/request'
 import type { Profile, Personnel , RuleForm } from './type'
 
 //人员列表查询
-export const getPersonnelList = (pageNum:number, pageSize:number , username?:string):ResponsePromise<PageInfo<Personnel>> => {
+export const getPersonnelList = (pageNum:number, pageSize:number , username?:string , status?:string):ResponsePromise<PageInfo<Personnel>> => {
     
     return  request({
         url: '/staff/user/list',
@@ -10,7 +10,8 @@ export const getPersonnelList = (pageNum:number, pageSize:number , username?:str
         params:{
             pageNum,
             pageSize,
-            username
+            username,
+            status
         }
     })
 }

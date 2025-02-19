@@ -4,16 +4,13 @@ export interface Personnel{
     nickName:string //昵称
     gender:number   //xingbie
     avatarUrl:string //头像地址
-    recruitSource: string//入职途径
-    entryTime:string //入职时间
     birthday:string //出生日期
-    bankAccount:string //银行账户
-    politicalIdentity:string //政治面貌
     email:string //邮箱
     phone:string //手机号
     deptName:string //部门
     posName:string //岗位
     posIds:number[] //岗位id
+    status:string //状态
 }
 
 export interface RuleForm {
@@ -21,15 +18,14 @@ export interface RuleForm {
     userId:number |null
     username:string //人员姓名
     nickName:string //昵称
-    gender:number |null   //xingbie
-    recruitSource: string//入职途径
-    entryTime: Date|null//入职时间
+    gender:number |null   //性别
     birthday:Date|null //出生日期
-    bankAccount:string //银行账户
-    politicalIdentity:string //政治面貌
     email:string //邮箱
     phone:string //手机号
     posIds:number[] //岗位id
+    empId:string //工号
+    emergency:string  //紧急联系人
+    emergencyPhone:string //紧急联系人电话
     }
 
     export  interface Profile {
@@ -40,4 +36,7 @@ export interface RuleForm {
         gender: string
         username: string
         createdTime: string
+        empId: string
+        emergency: string
+        emergencyPhone: string
       }
