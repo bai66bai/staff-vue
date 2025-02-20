@@ -317,6 +317,13 @@ const rules = reactive<FormRules<RuleForm>>({
       trigger: 'change'
     }
   ],
+  empId: [
+    {
+      required: true,
+      message: '请输入员工工号',
+      trigger: 'blur'
+    }
+  ],
   email: [
     {
       pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
