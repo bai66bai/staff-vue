@@ -23,13 +23,13 @@
 
     <!-- 操作按钮 -->
     <div class="action-buttons">
-      <el-button type="primary" @click="handleAdd" plain> <el-icon style="margin-right: 5px;">
+      <el-button type="primary" @click="handleAdd" v-hasPermi="['staff:user:add']" plain> <el-icon style="margin-right: 5px;">
           <Plus />
         </el-icon> 新增</el-button>
-      <el-button type="success" :disabled="single" @click="handleEdit" plain> <el-icon style="margin-right: 5px;">
+      <el-button type="success" :disabled="single" @click="handleEdit" v-hasPermi="['staff:user:edit']" plain> <el-icon style="margin-right: 5px;">
           <Edit />
         </el-icon> 修改</el-button>
-      <el-button type="danger" :disabled="multiple" @click="handleDelete" plain><el-icon style="margin-right: 5px;">
+      <el-button type="danger" :disabled="multiple" @click="handleDelete" v-hasPermi="['staff:user:delete']" plain><el-icon style="margin-right: 5px;">
           <Delete />
         </el-icon> 删除</el-button>
     </div>
@@ -57,13 +57,13 @@
       </el-table-column>
       <el-table-column align="center" label="操作" width="230">
         <template #default="scope">
-          <el-link type="primary" @click="handleEdit(scope.row)"><el-icon>
+          <el-link type="primary" v-hasPermi="['staff:user:edit']"  @click="handleEdit(scope.row)"><el-icon>
               <Edit />
             </el-icon>修改</el-link>
-          <el-link type="primary" @click="handleDelete(scope.row)"><el-icon>
+          <el-link type="primary" v-hasPermi="['staff:user:delete']" @click="handleDelete(scope.row)"><el-icon>
               <Delete />
             </el-icon>删除</el-link>
-          <el-link type="primary" @click="handleResetPwd(scope.row)"><el-icon>
+          <el-link type="primary" v-hasPermi="['staff:user:reset']" @click="handleResetPwd(scope.row)"><el-icon>
               <Key />
             </el-icon>重置密码</el-link>
         </template>
@@ -82,7 +82,7 @@
     <el-form ref="ruleFormRef" :model="formData" :rules="rules" label-width="120px">
       <!-- 用户名 -->
       <el-form-item label="用户名" prop="username">
-        <el-input v-model="formData.username" placeholder="请输入用户名" />
+        <el-input v-model="formData.username" :disabled="title=='修改人员信息'" placeholder="请输入用户名" />
       </el-form-item>
 
       <!-- 昵称 -->
@@ -264,9 +264,13 @@ const formData = reactive<RuleForm>({
 //添加人员
 const addPersonnelMsg = async () => {
   const result = await addPersonnel(formData)
-  ElMessage.success(result.data.msg ? result.data.msg : '添加成功')
-  //刷新页面
-  getPersonnelAllList();
+  if (result.data.status !== 200) {
+    ElMessage.error(result.data.msg ? result.data.msg : '添加失败')
+  } else{
+    ElMessage.success('人员添加成功')
+    //刷新页面
+    getPersonnelAllList();
+  }
   dialogFormVisible.value = false
 }
 //提交表单
@@ -337,7 +341,14 @@ const rules = reactive<FormRules<RuleForm>>({
       message: "请输入正确的手机号",
       trigger: "blur",
     }
-  ]
+  ],
+  emergencyPhone: [
+    {
+      pattern: /^(?:(?:\+|00)86)?1[3-9]\d{9}$/,
+      message: "请输入正确的手机号",
+      trigger: "blur",
+    }
+  ],
 })
 
 

@@ -1,6 +1,6 @@
 import request from "@/utils/request";
 
-import type { CompanyForm } from "./type";
+import type { CompanyForm, DeptTree } from "./type";
 
 //公司列表查询
 export const getCompanyList = (pageNum: number, pageSize: number, comName?: string): ResponsePromise<PageInfo<CompanyForm>> => {
@@ -51,5 +51,14 @@ export const updateCompanyInfo = (formDate: CompanyForm): ResponsePromise<string
         url: '/staff/company/update',
         method: "PUT",
         data: formDate
+    })
+}
+
+
+//获取部门下拉树
+export const getDeptTree = ():ResponsePromise<DeptTree> => {
+    return request({
+        url: '/staff/company/deptTree',
+        method: "GET"
     })
 }

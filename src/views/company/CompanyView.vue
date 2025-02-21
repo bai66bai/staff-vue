@@ -64,30 +64,48 @@
 
 
     <!-- 添加弹出框 -->
-    <el-dialog v-model="dialogFormVisible" :title="title" width="500" @closed="resetForm(ruleFormRef)">
-        <el-form ref="ruleFormRef" :model="formData" :rules="rules" label-width="120px">
-            <!-- 岗位名 -->
-            <el-form-item label="岗位名称" prop="posName">
-                <el-input v-model="formData.posName" placeholder="请输入岗位名称" />
+    <el-dialog v-model="dialogFormVisible" :title="title" width="50rem" @closed="resetForm(ruleFormRef)">
+        <el-form ref="ruleFormRef" :model="formData" :rules="rules" label-width="9rem">
+            <!-- 公司名 -->
+            <el-form-item label="公司名称" prop="comName">
+                <el-input v-model="formData.comName" placeholder="请输入公司名称" />
             </el-form-item>
 
-            <!-- 岗位编码 -->
-            <el-form-item label="岗位编码" prop="posCode">
-                <el-input v-model="formData.posCode" placeholder="请输入岗位编码" />
+            <el-form-item label="归属部门" prop="organizationId">
+                <el-tree-select  v-model="formData.organizationId" check-strictly :data="deptTree"
+                  :props="{ label: 'deptName', value: 'id' }" />
+            </el-form-item>
+            <!-- 统一社会信用编码 -->
+            <el-form-item label="统一社会信用代码" prop="socialCode">
+                <el-input v-model="formData.socialCode" placeholder="请输入岗位编码" />
             </el-form-item>
 
-            <!-- 岗位状态 -->
-            <el-form-item label="岗位状态" prop="status">
-                <el-radio-group v-model="formData.status">
-                    <el-radio :value="'0'">正常</el-radio>
-                    <el-radio :value="'1'">停用</el-radio>
-                </el-radio-group>
+            <!-- 营业执照注册地址 -->
+            <el-form-item label="营业执照注册地址" prop="businessAddress">
+                <el-input v-model="formData.businessAddress" placeholder="请输入营业执照注册地址" />
             </el-form-item>
 
-            <!-- 岗位备注 -->
-            <el-form-item label="岗位备注" prop="description">
-                <el-input v-model="formData.description" type="textarea" placeholder="请输入岗位备注" />
+            <!-- 收款账户名称 -->
+            <el-form-item label="收款账户名称" prop="accountName">
+                <el-input v-model="formData.accountName" placeholder="请输入收款账户名称" />
             </el-form-item>
+
+            <!-- 开户银行名称 -->
+            <el-form-item label="开户银行名称" prop="bankName">
+                <el-input v-model="formData.bankName" placeholder="请输入开户银行名称" />
+            </el-form-item>
+
+            <!-- 银行账户 -->
+            <el-form-item label="银行账户" prop="bankAccount">
+                <el-input v-model="formData.bankAccount" placeholder="请输入银行账户" />
+            </el-form-item>
+
+            <!-- 法人代表 -->
+            <el-form-item label="法人代表" prop="legalRepresentative">
+                <el-input v-model="formData.legalRepresentative" placeholder="请输入法人代表" />
+            </el-form-item>
+
+
             <el-form-item>
                 <el-button type="primary" @click="submitForm(ruleFormRef)">
                     提交
@@ -101,16 +119,17 @@
 
 <script setup lang="ts">
 import { onMounted, reactive, ref } from "vue";
-import { addPosition, updatePosition, selectPositionByPosId, deletePosition } from "@/api/position"
-import {getCompanyList} from "@/api/company"
+import { getCompanyList, addCompanyInfo, updateCompanyInfo, selectCompanyByComId , deleteCompanyInfo , getDeptTree } from "@/api/company"
 import { Edit, Delete, Search, Refresh, Plus } from '@element-plus/icons-vue'
-import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from "element-plus"
-import type { PostRuleForm } from "@/api/position/type"
+import { ElMessage, ElMessageBox,  type FormInstance, type FormRules } from "element-plus"
 import Pagination from '@/components/Pagination/index.vue'
+import type { CompanyForm } from "@/api/company/type";
+import type { DeptTree } from "@/api/company/type";
 // 搜索表单
 const searchForm = reactive({
     comName: "",
 });
+
 
 // 分页数据
 const pagination = reactive({
@@ -146,8 +165,10 @@ async function getCompanyAllList() {
 }
 
 //页面加载时获取数据
-onMounted(() => {
+onMounted(async () => {
     getCompanyAllList();
+    const deptRet = await getDeptTree();
+    deptTree.value = [deptRet.data.data];
 });
 
 // 搜索逻辑
@@ -161,10 +182,24 @@ const handleReset = () => {
     getCompanyAllList();
 };
 
+
+//获取部门树
+const deptTree = ref<DeptTree[]>([]);
+
+
+interface Tree {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any
+}
+const deptName = ref('');
+
+
 // 新增打开弹窗
 const handleAdd = async () => {
-    title.value = "添加岗位信息";
+    title.value = "添加公司信息";
+
     dialogFormVisible.value = true
+
 };
 
 
@@ -172,7 +207,7 @@ const ids = ref<any>([])
 
 // 行选择变化
 const handleSelectionChange = (rows: any[]) => {
-    ids.value = rows.map(item => item.posId)
+    ids.value = rows.map(item => item.comId)
     single.value = rows.length != 1
     multiple.value = !rows.length
 };
@@ -180,25 +215,33 @@ const handleSelectionChange = (rows: any[]) => {
 
 
 const ruleFormRef = ref<FormInstance>()
+
+
 //定义变量 控制标题的引用
 const title = ref('')
 
-//添加
-const formData = reactive<PostRuleForm>({
-    posName: '',
-    posCode: '',
-    status: '0',
-    description: ''
+
+
+//添加公司信息
+const formData = reactive<CompanyForm>({
+    comName: '',
+    socialCode: '',
+    businessAddress: '',
+    organizationId: null,
+    accountName: '',
+    bankName: '',
+    bankAccount: '',
+    legalRepresentative: '',
 })
 
-//添加岗位信息
-const addPositionMsg = async () => {
-    const result = await addPosition(formData)
+//添加公司信息
+const addCompanyMsg = async () => {
+    const result = await addCompanyInfo(formData)
 
     if (result.data.status !== 200) {
-        ElMessage.error(result.data.msg ? result.data.msg : '岗位添加失败')
+        ElMessage.error(result.data.msg ? result.data.msg : '公司信息添加失败')
     } else {
-        ElMessage.success('岗位添加成功')
+        ElMessage.success('公司信息添加成功')
         //刷新页面
         getCompanyAllList();
     }
@@ -211,7 +254,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
     await formEl.validate((valid, fields) => {
         if (valid) {
             //添加人员
-            title.value === '添加岗位信息' ? addPositionMsg() : updatePositionMsg()
+            title.value === '添加公司信息' ? addCompanyMsg() : updateCompanyMsg()
 
         } else {
             console.log('error submit!', fields)
@@ -221,22 +264,20 @@ const submitForm = async (formEl: FormInstance | undefined) => {
 
 
 //点击修改查询数据通过 UserId查询数据 回显
-const handleEdit = async (row: { posId: number }) => {
-    title.value = "修改岗位信息";
+const handleEdit = async (row: { comId: number }) => {
+    title.value = "修改公司信息";
     resetForm(ruleFormRef.value);
     dialogFormVisible.value = true
-    const posId: number = row.posId || ids.value[0]
-    const { data } = await selectPositionByPosId(posId);
-    console.log(data);
+    const comId: number = row.comId || ids.value[0]
+    const { data } = await selectCompanyByComId(comId);
 
     Object.assign(formData, data.data)
-    console.log(formData);
 };
 
 
 //修改岗位信息
-const updatePositionMsg = async () => {
-    const result = await updatePosition(formData)
+const updateCompanyMsg = async () => {
+    const result = await updateCompanyInfo(formData)
 
     if (result.data.status !== 200) {
         ElMessage.error(result.data.msg ? result.data.msg : '修改失败')
@@ -255,21 +296,36 @@ const resetForm = (formEl: FormInstance | undefined) => {
 }
 
 //表单校验
-const rules = reactive<FormRules<PostRuleForm>>({
-    posName: [
-        { required: true, message: '岗位名称不能为空', trigger: 'blur' }
+const rules = reactive<FormRules<CompanyForm>>({
+    comName: [
+        { required: true, message: '公司名称不能为空', trigger: 'blur' }
     ],
-    posCode: [
-        { required: true, message: '岗位编码不能为空', trigger: 'blur' }
+    socialCode: [
+        { required: true, message: '统一社会信任代码不能为空', trigger: 'blur' }
+    ],
+    businessAddress: [
+        { required: true, message: '营业执照注册地址不能为空', trigger: 'blur' }
+    ],
+    accountName: [
+        { required: true, message: '收款账户名称不能为空', trigger: 'blur' }
+    ],
+    bankName: [
+        { required: true, message: '开户银行名称不能为空', trigger: 'blur' }
+    ],
+    bankAccount: [
+        { required: true, message: '银行账户不能为空', trigger: 'blur' }
+    ],
+    legalRepresentative: [
+        { required: true, message: '法人代表不能为空', trigger: 'blur' }
     ]
 })
 
 
-// 删除岗位信息
-const handleDelete = (row: { posId: number }) => {
-    const posId: number | any[] = row.posId || ids.value
+// 删除信息
+const handleDelete = (row: { comId: number }) => {
+    const comId: number | any[] = row.comId || ids.value
     ElMessageBox.confirm(
-        '你确定要删除岗位编号为"' + posId + '"的数据吗?',
+        '你确定要删除编号为"' + comId + '"的公司信息吗?',
         '提示',
         {
             confirmButtonText: '确定',
@@ -279,7 +335,7 @@ const handleDelete = (row: { posId: number }) => {
     )
         .then(async () => {
             //调用接口
-            const result = await deletePosition(posId)
+            const result = await deleteCompanyInfo(comId)
 
             if (result.data.status == 200) {
                 ElMessage({
@@ -301,8 +357,12 @@ const handleDelete = (row: { posId: number }) => {
 };
 
 
-
 </script>
+
+
+
+
+
 
 <style scoped>
 .bigbox {
