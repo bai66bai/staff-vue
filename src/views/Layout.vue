@@ -35,7 +35,7 @@
 </template>
 
 
-<script setup>
+<script setup lang="ts">
 import { ElMessage, ElMessageBox } from 'element-plus'
 import useStore from '@/stores'
 import { watch } from 'vue';
@@ -56,8 +56,6 @@ const activeMenu = computed(() => settingsStore.currentRoute);
 watch(() => route.path, (newPath) => {
     settingsStore.currentRoute = newPath;
 });
-
-
 
 
 const LogOut = () => {
