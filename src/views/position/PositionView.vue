@@ -25,13 +25,13 @@
 
         <!-- 操作按钮 -->
         <div class="action-buttons">
-            <el-button type="primary" @click="handleAdd" plain> <el-icon style="margin-right: 5px;">
+            <el-button type="primary" v-hasPermi="['staff:position:add']" @click="handleAdd" plain> <el-icon style="margin-right: 5px;">
                     <Plus />
                 </el-icon> 新增</el-button>
-            <el-button type="success" :disabled="single" @click="handleEdit" plain> <el-icon style="margin-right: 5px;">
+            <el-button type="success" :disabled="single" v-hasPermi="['staff:position:edit']" @click="handleEdit" plain> <el-icon style="margin-right: 5px;">
                     <Edit />
                 </el-icon> 修改</el-button>
-            <el-button type="danger" :disabled="multiple" @click="handleDelete" plain><el-icon
+            <el-button type="danger" :disabled="multiple" v-hasPermi="['staff:position:delete']" @click="handleDelete" plain><el-icon
                     style="margin-right: 5px;">
                     <Delete />
                 </el-icon> 删除</el-button>
@@ -57,12 +57,12 @@
                     {{ scope.row.createTime.toLocaleString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/, '') }}
                 </template>
             </el-table-column>
-            <el-table-column align="center" label="操作" width="150">
+            <el-table-column align="center"  label="操作" width="150">
                 <template #default="scope">
-                    <el-link type="primary" @click="handleEdit(scope.row)"><el-icon>
+                    <el-link type="primary" v-hasPermi="['staff:position:edit']" @click="handleEdit(scope.row)"><el-icon>
                             <Edit />
                         </el-icon>修改</el-link>
-                    <el-link type="primary" @click="handleDelete(scope.row)"><el-icon>
+                    <el-link type="primary" v-hasPermi="['staff:position:delete']" @click="handleDelete(scope.row)"><el-icon>
                             <Delete />
                         </el-icon>删除</el-link>
                 </template>
@@ -320,11 +320,13 @@ const handleDelete = (row: { posId: number }) => {
                 ElMessage.error(result.data.msg ? result.data.msg : '删除失败')
             }
         })
-        .catch(() => {
-            ElMessage({
-                type: 'info',
-                message: '取消删除',
-            })
+        .catch((e) => {
+            if(e === 'cancel'){
+                ElMessage({
+                    type: 'info',
+                    message: '取消删除',
+                })
+            }
         })
 };
 

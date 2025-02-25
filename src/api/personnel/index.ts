@@ -1,17 +1,16 @@
 import request from '@/utils/request'
-import type { Profile, Personnel , RuleForm } from './type'
+import type { Profile, Personnel , RuleForm, UserQueryParams } from './type'
+import qs from 'qs'
 
 //人员列表查询
-export const getPersonnelList = (pageNum:number, pageSize:number , username?:string , status?:string):ResponsePromise<PageInfo<Personnel>> => {
+export const getPersonnelList = (params:UserQueryParams):ResponsePromise<PageInfo<Personnel>> => {
     
     return  request({
         url: '/staff/user/list',
         method:"GET",
-        params:{
-            pageNum,
-            pageSize,
-            username,
-            status
+        params,
+        paramsSerializer: (params) => {
+            return qs.stringify(params, { encode: true, arrayFormat: 'brackets' })
         }
     })
 }

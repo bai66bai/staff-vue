@@ -11,8 +11,12 @@
           <el-option label="离职" value="1"></el-option>
         </el-select>
       </el-form-item>
+      <el-form-item label="创建时间">
+            <el-date-picker v-model="createTimeRange" type="daterange" range-separator="-" value-format="YYYY-MM-DD"
+              start-placeholder="开始日期" @change="handleRangeChange" end-placeholder="结束日期" unlink-panels />
+          </el-form-item>
       <el-form-item>
-        <el-button type="primary" plain @click="handleSearch"><el-icon>
+        <el-button type="primary"  plain @click="handleSearch"><el-icon>
             <Search />
           </el-icon>搜索</el-button>
         <el-button @click="handleReset"><el-icon>
@@ -23,13 +27,13 @@
 
     <!-- 操作按钮 -->
     <div class="action-buttons">
-      <el-button type="primary" @click="handleAdd" v-hasPermi="['staff:user:add']" plain> <el-icon style="margin-right: 5px;">
+      <el-button type="primary" @click="handleAdd" v-hasRole="['admin']" plain> <el-icon style="margin-right: 5px;">
           <Plus />
         </el-icon> 新增</el-button>
       <el-button type="success" :disabled="single" @click="handleEdit" v-hasPermi="['staff:user:edit']" plain> <el-icon style="margin-right: 5px;">
           <Edit />
         </el-icon> 修改</el-button>
-      <el-button type="danger" :disabled="multiple" @click="handleDelete" v-hasPermi="['staff:user:delete']" plain><el-icon style="margin-right: 5px;">
+      <el-button type="danger" :disabled="multiple" @click="handleDelete" v-hasRole="['admin']" plain><el-icon style="margin-right: 5px;">
           <Delete />
         </el-icon> 删除</el-button>
     </div>
@@ -40,7 +44,6 @@
       <el-table-column align="center" fixed prop="userId" label="用户编号" width="150" />
       <el-table-column align="center" prop="username" label="用户名" />
       <el-table-column align="center" prop="nickName" label="用户昵称" />
-      <el-table-column align="center" prop="deptName" label="部门" />
       <el-table-column align="center" prop="phone" label="手机号" />
       <el-table-column align="center" prop="status" label="状态">
         <template #default="scope">
@@ -57,10 +60,10 @@
       </el-table-column>
       <el-table-column align="center" label="操作" width="230">
         <template #default="scope">
-          <el-link type="primary" v-hasPermi="['staff:user:edit']"  @click="handleEdit(scope.row)"><el-icon>
+          <el-link type="primary"  v-hasPermi="['staff:user:edit']" @click="handleEdit(scope.row)"><el-icon>
               <Edit />
             </el-icon>修改</el-link>
-          <el-link type="primary" v-hasPermi="['staff:user:delete']" @click="handleDelete(scope.row)"><el-icon>
+          <el-link type="primary" v-hasRole="['admin']"  @click="handleDelete(scope.row)"><el-icon>
               <Delete />
             </el-icon>删除</el-link>
           <el-link type="primary" v-hasPermi="['staff:user:reset']" @click="handleResetPwd(scope.row)"><el-icon>
@@ -71,7 +74,7 @@
     </el-table>
 
     <!-- 分页 -->
-    <Pagination :current-page="pagination.pageNum" :page-size="pagination.pageSize" :total="pagination.total"
+    <Pagination :current-page="searchForm.pageNum as number" :page-size="searchForm.pageSize as number" :total="total"
       @update:currentPage="handlePageChange" @update:pageSize="handlePageSizeChange" />
   </div>
 
@@ -159,29 +162,22 @@ import { onMounted, reactive, ref } from "vue";
 import { getPersonnelList, addPersonnel, deletePersonnel, selectPersonnelByUserId, updatePersonnel, resetPassword } from '@/api/personnel'
 import { Edit, Delete, Search, Refresh, Plus, Key } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from "element-plus";
-import type { RuleForm } from "@/api/personnel/type";
+import type { RuleForm, UserQueryParams } from "@/api/personnel/type";
 import Pagination from '@/components/Pagination/index.vue'
 // 搜索表单
-const searchForm = reactive({
-  username: "",
-  status: ""
-});
-// 分页数据
-const pagination = reactive({
-  pageNum: 1,
-  pageSize: 20,
-  total: 0,
-});
+const searchForm = ref<UserQueryParams>({ pageNum: 1, pageSize: 20, params: {} });
 
+
+const total = ref(0)
 // 分页变化
 const handlePageChange = (page: number) => {
-  pagination.pageNum = page;
+  searchForm.value.pageNum = page;
   getPersonnelAllList();
 };
 
 //页面显示条数变化
 const handlePageSizeChange = (size: number) => {
-  pagination.pageSize = size;
+  searchForm.value.pageSize = size;
   getPersonnelAllList();
 };
 
@@ -193,14 +189,21 @@ const multiple = ref(true) //控制批量删除
 let tableData = ref();
 //获取人员列表数据
 const getPersonnelAllList = async () => {
-  const result = await getPersonnelList(pagination.pageNum, pagination.pageSize, searchForm.username , searchForm.status)
+  const result = await getPersonnelList(searchForm.value)
   tableData.value = result.data.data.rows
-  pagination.total = result.data.data.total
+  total.value = result.data.data.total
 }
 
 onMounted(() => {
   getPersonnelAllList();
 });
+
+//创建时间选择
+const createTimeRange = ref<[string, string]>(['', ''])
+function handleRangeChange() {
+  searchForm.value.params.beginTime = createTimeRange.value[0]
+  searchForm.value.params.endTime = createTimeRange.value[1]
+}
 
 // 搜索逻辑
 const handleSearch = () => {
@@ -209,8 +212,9 @@ const handleSearch = () => {
 
 // 重置搜索条件
 const handleReset = () => {
-  searchForm.username = "";
-  searchForm.status = "";
+  searchForm.value.username = "";
+  searchForm.value.status = "";
+  searchForm.value.params = {}
   getPersonnelAllList();
 };
 
@@ -321,13 +325,6 @@ const rules = reactive<FormRules<RuleForm>>({
       trigger: 'change'
     }
   ],
-  empId: [
-    {
-      required: true,
-      message: '请输入员工工号',
-      trigger: 'blur'
-    }
-  ],
   email: [
     {
       pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
@@ -367,7 +364,6 @@ const handleDelete = (row: { userId: number }) => {
     .then(async () => {
       //调用接口
       const result = await deletePersonnel(userId)
-      console.log(result);
       if (result.data.status !== 200) {
         ElMessage.error(result.data.msg ? result.data.msg : '删除失败')
       } else {

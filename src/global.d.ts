@@ -56,3 +56,10 @@ declare interface RouteRecordWhale extends RouteRecordRaw {
     noCache: boolean
     title: string
   }
+
+  declare interface QueryParams {
+    pageNum?: number
+    pageSize?: number
+    params: Record<string, string | number>
+  }
+  

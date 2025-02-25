@@ -40,3 +40,9 @@ export interface RuleForm {
         emergency: string
         emergencyPhone: string
       }
+
+
+export interface UserQueryParams extends QueryParams {
+    username?:string
+    status?:string 
+}

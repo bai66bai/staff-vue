@@ -17,13 +17,13 @@
 
         <!-- 操作按钮 -->
         <div class="action-buttons">
-            <el-button type="primary" @click="handleAdd" plain> <el-icon style="margin-right: 5px;">
+            <el-button type="primary" @click="handleAdd" v-hasPermi="['staff:company:add']" plain> <el-icon style="margin-right: 5px;">
                     <Plus />
                 </el-icon> 新增</el-button>
-            <el-button type="success" :disabled="single" @click="handleEdit" plain> <el-icon style="margin-right: 5px;">
+            <el-button type="success" :disabled="single" v-hasPermi="['staff:company:edit']" @click="handleEdit" plain> <el-icon style="margin-right: 5px;">
                     <Edit />
                 </el-icon> 修改</el-button>
-            <el-button type="danger" :disabled="multiple" @click="handleDelete" plain><el-icon
+            <el-button type="danger" :disabled="multiple" v-hasPermi="['staff:company:delete']" @click="handleDelete" plain><el-icon
                     style="margin-right: 5px;">
                     <Delete />
                 </el-icon> 删除</el-button>
@@ -36,7 +36,7 @@
             <el-table-column align="center" fixed prop="comId" label="编码" />
             <el-table-column align="center" prop="comName" label="公司名称" />
             <el-table-column align="center" prop="socialCode" label="统一社会信任代码" />
-            <el-table-column align="center" show-overflow-tooltip="true" prop="businessAddress" label="营业执照注册地址" />
+            <el-table-column align="center" :show-overflow-tooltip="true" prop="businessAddress" label="营业执照注册地址" />
             <el-table-column align="center" prop="accountName" label="收款账户名称" />
             <el-table-column align="center" prop="legalRepresentative" label="公司法人" />
             <el-table-column align="center" prop="createdTime" label="信息创建时间">
@@ -46,10 +46,10 @@
             </el-table-column>
             <el-table-column align="center" label="操作" width="150">
                 <template #default="scope">
-                    <el-link type="primary" @click="handleEdit(scope.row)"><el-icon>
+                    <el-link type="primary" v-hasPermi="['staff:company:edit']" @click="handleEdit(scope.row)"><el-icon>
                             <Edit />
                         </el-icon>修改</el-link>
-                    <el-link type="primary" @click="handleDelete(scope.row)"><el-icon>
+                    <el-link type="primary" v-hasPermi="['staff:company:delete']" @click="handleDelete(scope.row)"><el-icon>
                             <Delete />
                         </el-icon>删除</el-link>
                 </template>
@@ -73,11 +73,11 @@
 
             <el-form-item label="归属部门" prop="organizationId">
                 <el-tree-select  v-model="formData.organizationId" check-strictly :data="deptTree"
-                  :props="{ label: 'deptName', value: 'id' }" />
+                  :props="{ label: 'deptName', value: 'uniId' }" />
             </el-form-item>
             <!-- 统一社会信用编码 -->
             <el-form-item label="统一社会信用代码" prop="socialCode">
-                <el-input v-model="formData.socialCode" placeholder="请输入岗位编码" />
+                <el-input v-model="formData.socialCode" placeholder="请输入统一社会信用代码" />
             </el-form-item>
 
             <!-- 营业执照注册地址 -->
@@ -191,7 +191,6 @@ interface Tree {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any
 }
-const deptName = ref('');
 
 
 // 新增打开弹窗
@@ -227,7 +226,7 @@ const formData = reactive<CompanyForm>({
     comName: '',
     socialCode: '',
     businessAddress: '',
-    organizationId: null,
+    organizationId: undefined,
     accountName: '',
     bankName: '',
     bankAccount: '',
@@ -300,6 +299,9 @@ const rules = reactive<FormRules<CompanyForm>>({
     comName: [
         { required: true, message: '公司名称不能为空', trigger: 'blur' }
     ],
+    organizationId:[
+        { required: true, message: '归属部门不能为空', trigger: 'blur' }
+    ],
     socialCode: [
         { required: true, message: '统一社会信任代码不能为空', trigger: 'blur' }
     ],
@@ -348,11 +350,13 @@ const handleDelete = (row: { comId: number }) => {
                 ElMessage.error(result.data.msg ? result.data.msg : '删除失败')
             }
         })
-        .catch(() => {
-            ElMessage({
+        .catch((e) => {
+            if(e == 'cannel'){
+                ElMessage({
                 type: 'info',
                 message: '取消删除',
             })
+            } 
         })
 };
 
