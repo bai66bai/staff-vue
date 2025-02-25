@@ -47,7 +47,7 @@
       <el-table-column align="center" prop="phone" label="手机号" />
       <el-table-column align="center" prop="status" label="状态">
         <template #default="scope">
-                    <el-tag :type="scope.row.status == '0' ? 'primary' : 'danger'"
+                    <el-tag style="animation: none; transition: none;" :type="scope.row.status == '0' ? 'primary' : 'danger'"
                         :style="{ width: '55px', height: '30px' }">
                         {{ scope.row.status == "0" ? '在职' : '离职' }}
                     </el-tag>

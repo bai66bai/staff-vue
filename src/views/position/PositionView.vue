@@ -46,7 +46,7 @@
             <el-table-column align="center" prop="posName" label="岗位名称" />
             <el-table-column align="center" prop="status" label="岗位状态">
                 <template #default="scope">
-                    <el-tag :type="scope.row.status == '0' ? 'primary' : 'danger'"
+                    <el-tag style="animation: none; transition: none;" :type="scope.row.status == '0' ? 'primary' : 'danger'"
                         :style="{ width: '55px', height: '30px' }">
                         {{ scope.row.status == "0" ? '正常' : '停用' }}
                     </el-tag>
