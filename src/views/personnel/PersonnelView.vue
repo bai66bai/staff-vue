@@ -33,9 +33,9 @@
       <el-button type="success" :disabled="single" @click="handleEdit" v-hasPermi="['staff:user:edit']" plain> <el-icon style="margin-right: 5px;">
           <Edit />
         </el-icon> 修改</el-button>
-      <el-button type="danger" :disabled="multiple" @click="handleDelete" v-hasRole="['admin']" plain><el-icon style="margin-right: 5px;">
+      <!-- <el-button type="danger" :disabled="multiple" @click="handleDelete" v-hasRole="['admin']" plain><el-icon style="margin-right: 5px;">
           <Delete />
-        </el-icon> 删除</el-button>
+        </el-icon> 删除</el-button> -->
     </div>
     <!-- 表格 -->
     <el-table :data="tableData" :header-cell-style="{ background: '#f8f8f9' }" style="width: 100% ; height: 100%;"
@@ -63,9 +63,9 @@
           <el-link type="primary"  v-hasPermi="['staff:user:edit']" @click="handleEdit(scope.row)"><el-icon>
               <Edit />
             </el-icon>修改</el-link>
-          <el-link type="primary" v-hasRole="['admin']"  @click="handleDelete(scope.row)"><el-icon>
+          <!-- <el-link type="primary" v-hasRole="['admin']"  @click="handleDelete(scope.row)"><el-icon>
               <Delete />
-            </el-icon>删除</el-link>
+            </el-icon>删除</el-link> -->
           <el-link type="primary" v-hasPermi="['staff:user:reset']" @click="handleResetPwd(scope.row)"><el-icon>
               <Key />
             </el-icon>重置密码</el-link>
