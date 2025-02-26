@@ -4,6 +4,7 @@ import axios, { AxiosError } from 'axios';
 import { ElMessage , ElMessageBox } from 'element-plus';
 import { getToken } from '@/utils/auth';
 import { errCodeMap } from '@/dictionary/requestDict';
+import { hideLoading } from './wr';
 
 const request = axios.create({
   //将环境变量中的VITE_BASE_URL赋值给baseURL
@@ -39,7 +40,7 @@ request.interceptors.response.use(
   },
   async (error: AxiosError<ResponseRecord<any>>) => {
     console.error(error.message)
-
+    hideLoading()
     if (error.response) {
       if (error.response.status === 401) {
         if (error.config && error.config.url === '/login') {
