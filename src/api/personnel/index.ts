@@ -1,6 +1,7 @@
 import request from '@/utils/request'
 import type { Profile, Personnel , RuleForm, UserQueryParams } from './type'
 import qs from 'qs'
+import { rasEncrypt } from '@/utils/wr'
 
 //人员列表查询
 export const getPersonnelList = (params:UserQueryParams):ResponsePromise<PageInfo<Personnel>> => {
@@ -106,8 +107,8 @@ export const updateProfile = (formDate:Profile):ResponsePromise<string> =>{
 //用户密码修改
 export const updatePassword = (oldPassword:string, password:string):ResponsePromise<string> =>{
     const data = {
-        oldPassword,
-        password
+        oldPassword : rasEncrypt(oldPassword),
+        password : rasEncrypt(password)
     }
     return request({
         url: '/staff/user/updatePwd',
