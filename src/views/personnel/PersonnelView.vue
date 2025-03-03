@@ -318,13 +318,6 @@ const rules = reactive<FormRules<RuleForm>>({
     { required: true, message: '请输入用户名', trigger: 'blur' },
     { min: 2, message: '用户名最少为两个字', trigger: 'blur' }
   ],
-  gender: [
-    {
-      required: true,
-      message: '请选择性别',
-      trigger: 'change'
-    }
-  ],
   email: [
     {
       pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
