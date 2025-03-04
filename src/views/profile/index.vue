@@ -92,17 +92,16 @@ const user = ref({
 })
 
 
-onMounted(() => {
-    getProfileInfo();
+onMounted(async () => {
+    await getProfileInfo();
 });
 
 
 //获取个人信息
 const getProfileInfo = async () =>{
     const result = await getProfile()
-    user.value = result.data.data
+    user.value = result.data.data ?? user.value
 }
-
 
 </script>
 
