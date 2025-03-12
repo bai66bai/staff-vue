@@ -16,6 +16,13 @@ export const getPersonnelList = (params:UserQueryParams):ResponsePromise<PageInf
     })
 }
 
+//从auth系统同步人员信息
+export const syncPersonnel = ():ResponsePromise<string> =>{
+    return request({
+        url: '/staff/user/getUserList',
+        method:"GET"
+    })
+}
 
 //新增人员信息
 export const addPersonnel = (formDate:RuleForm):ResponsePromise<string> =>{
@@ -35,6 +42,7 @@ export const deletePersonnel = (userId:number | any[]):ResponsePromise<string> =
         method:"DELETE"
     })
 }
+
 
 //根据id查询人员信息
 export const selectPersonnelByUserId = (userId?:number):ResponsePromise<RuleForm>=>{

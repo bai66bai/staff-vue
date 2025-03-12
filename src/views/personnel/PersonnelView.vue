@@ -5,12 +5,6 @@
       <el-form-item label="用户名称：" label-width="85px">
         <el-input v-model="searchForm.username" placeholder="请输入用户名"></el-input>
       </el-form-item>
-      <el-form-item label="用户状态：" label-width="85px">
-        <el-select v-model="searchForm.status" placeholder="请选择状态" style="width: 240px">
-          <el-option label="在职" value="0"></el-option>
-          <el-option label="离职" value="1"></el-option>
-        </el-select>
-      </el-form-item>
       <el-form-item label="创建时间">
             <el-date-picker v-model="createTimeRange" type="daterange" range-separator="-" value-format="YYYY-MM-DD"
               start-placeholder="开始日期" @change="handleRangeChange" end-placeholder="结束日期" unlink-panels />
@@ -25,18 +19,6 @@
       </el-form-item>
     </el-form>
 
-    <!-- 操作按钮 -->
-    <div class="action-buttons">
-      <el-button type="primary" @click="handleAdd" v-hasRole="['admin']" plain> <el-icon style="margin-right: 5px;">
-          <Plus />
-        </el-icon> 新增</el-button>
-      <el-button type="success" :disabled="single" @click="handleEdit" v-hasPermi="['staff:user:edit']" plain> <el-icon style="margin-right: 5px;">
-          <Edit />
-        </el-icon> 修改</el-button>
-      <!-- <el-button type="danger" :disabled="multiple" @click="handleDelete" v-hasRole="['admin']" plain><el-icon style="margin-right: 5px;">
-          <Delete />
-        </el-icon> 删除</el-button> -->
-    </div>
     <!-- 表格 -->
     <el-table :data="tableData" :header-cell-style="{ background: '#f8f8f9' }" style="width: 100% ; height: 100%;"
       @selection-change="handleSelectionChange">
@@ -63,9 +45,6 @@
           <el-link type="primary"  v-hasPermi="['staff:user:edit']" @click="handleEdit(scope.row)"><el-icon>
               <Edit />
             </el-icon>修改</el-link>
-          <!-- <el-link type="primary" v-hasRole="['admin']"  @click="handleDelete(scope.row)"><el-icon>
-              <Delete />
-            </el-icon>删除</el-link> -->
           <el-link type="primary" v-hasPermi="['staff:user:reset']" @click="handleResetPwd(scope.row)"><el-icon>
               <Key />
             </el-icon>重置密码</el-link>
@@ -85,7 +64,7 @@
     <el-form ref="ruleFormRef" :model="formData" :rules="rules" label-width="120px">
       <!-- 用户名 -->
       <el-form-item label="用户名" prop="username">
-        <el-input v-model="formData.username" :disabled="title=='修改人员信息'" placeholder="请输入用户名" />
+        {{ formData.username }}
       </el-form-item>
 
       <!-- 昵称 -->
@@ -113,13 +92,6 @@
             :disabled="item.status == '1'" />
         </el-select>
       </el-form-item>
-      <el-form-item label="状态" prop="status">
-        <el-radio-group v-model="formData.status">
-          <el-radio :value="'0'">在职</el-radio>
-          <el-radio :value="'1'">离职</el-radio>
-        </el-radio-group>
-      </el-form-item>
-
 
       <!-- 出生日期 -->
       <el-form-item label="出生日期" prop="birthday">
@@ -159,8 +131,8 @@
 
 <script setup lang="ts">
 import { onMounted, reactive, ref } from "vue";
-import { getPersonnelList, addPersonnel, deletePersonnel, selectPersonnelByUserId, updatePersonnel, resetPassword } from '@/api/personnel'
-import { Edit, Delete, Search, Refresh, Plus, Key } from '@element-plus/icons-vue'
+import { getPersonnelList,selectPersonnelByUserId, updatePersonnel, resetPassword, syncPersonnel } from '@/api/personnel'
+import { Edit, Search, Refresh, Key } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from "element-plus";
 import type { RuleForm, UserQueryParams } from "@/api/personnel/type";
 import Pagination from '@/components/Pagination/index.vue'
@@ -196,6 +168,7 @@ const getPersonnelAllList = async () => {
 
 onMounted(() => {
   getPersonnelAllList();
+  syncPersonnel();
 });
 
 //创建时间选择
@@ -265,25 +238,12 @@ const formData = reactive<RuleForm>({
   status: '0'
 })
 
-//添加人员
-const addPersonnelMsg = async () => {
-  const result = await addPersonnel(formData)
-  if (result.data.status !== 200) {
-    ElMessage.error(result.data.msg ? result.data.msg : '添加失败')
-  } else{
-    ElMessage.success('人员添加成功')
-    //刷新页面
-    getPersonnelAllList();
-  }
-  dialogFormVisible.value = false
-}
 //提交表单
 const submitForm = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate((valid, fields) => {
     if (valid) {
-      //添加人员
-      title.value === '添加人员信息' ? addPersonnelMsg() : updatePersonnelMsg()
+      updatePersonnelMsg()
     } else {
       console.log('error submit!', fields)
     }
@@ -315,7 +275,7 @@ const resetForm = (formEl: FormInstance | undefined) => {
 //表单校验
 const rules = reactive<FormRules<RuleForm>>({
   username: [
-    { required: true, message: '请输入用户名', trigger: 'blur' },
+    {  message: '请输入用户名', trigger: 'blur' },
     { min: 2, message: '用户名最少为两个字', trigger: 'blur' }
   ],
   email: [
@@ -340,43 +300,6 @@ const rules = reactive<FormRules<RuleForm>>({
     }
   ],
 })
-
-
-// 删除人员模块
-const handleDelete = (row: { userId: number }) => {
-  const userId: number | any[] = row.userId || ids.value
-  ElMessageBox.confirm(
-    '你确定要删除ID为”' + userId + '” 的人员吗?',
-    '提示',
-    {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning',
-    }
-  )
-    .then(async () => {
-      //调用接口
-      const result = await deletePersonnel(userId)
-      if (result.data.status !== 200) {
-        ElMessage.error(result.data.msg ? result.data.msg : '删除失败')
-      } else {
-        ElMessage({
-          type: 'success',
-          message: '删除成功',
-        })
-        //刷新列表
-        getPersonnelAllList();
-      }
-    })
-    .catch((e) => {
-      if (e == 'cancel') {
-        ElMessage({
-          type: 'info',
-          message: '取消删除',
-        })
-      }
-    })
-};
 
 //重置人员密码模块
 const handleResetPwd = (row: { userId: number }) => {

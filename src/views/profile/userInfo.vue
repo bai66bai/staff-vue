@@ -104,6 +104,7 @@ const submit = () => {
                 ElMessage.success('修改成功')
                 emit('update:user', {
                     ...props.user,
+                    nickName: form.nickName,
                     phone: form.phone,
                     email: form.email,
                     gender: form.gender,
