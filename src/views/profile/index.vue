@@ -79,8 +79,7 @@ import { getProfile } from '@/api/personnel'
 const activeTab = ref<string>('userinfo')
 
 const user = ref({
-    userId: null as number | null,
-    nickName: '',
+    id: null as number | null,
     phone: '',
     email: '',
     gender: '0',
@@ -88,7 +87,9 @@ const user = ref({
     createdTime: '',
     empId: '',
     emergency:'',
-    emergencyPhone: ''
+    emergencyPhone: '',
+    bankName: '',
+    bankCardAccount: ''
 })
 
 

@@ -1,8 +1,5 @@
 <template>
     <el-form ref="formRef" :model="form" :rules="rules" label-width="8rem">
-        <el-form-item label="用户昵称" prop="nickName">
-            <el-input v-model="form.nickName" maxlength="30" />
-        </el-form-item>
         <el-form-item label="手机号码" prop="phone">
             <el-input v-model="form.phone" maxlength="11" />
         </el-form-item>
@@ -15,6 +12,12 @@
         <el-form-item label="邮箱" prop="email">
             <el-input v-model="form.email" maxlength="50" />
         </el-form-item>
+        <el-form-item label="开户行" prop="bankName">
+            <el-input v-model="form.bankName" maxlength="50" />
+        </el-form-item>
+        <el-form-item label="银行卡号" prop="bankCardAccount">
+            <el-input v-model="form.bankCardAccount" maxlength="50" />
+        </el-form-item>
         <el-form-item label="性别">
             <el-radio-group v-model="form.gender">
                 <el-radio :value="1">男</el-radio>
@@ -22,7 +25,7 @@
             </el-radio-group>
         </el-form-item>
         <el-form-item>
-            <el-button type="primary"  @click="submit">保存</el-button>
+            <el-button type="primary" @click="submit">保存</el-button>
         </el-form-item>
     </el-form>
 </template>
@@ -43,8 +46,7 @@ const emit = defineEmits(['update:user'])
 
 const formRef = ref<FormInstance>()
 const form = reactive<Profile>({
-    userId: props.user.userId,
-    nickName: '',
+    id: props.user.id,
     phone: '',
     email: '',
     gender: '',
@@ -52,7 +54,9 @@ const form = reactive<Profile>({
     createdTime: '',
     empId: '',
     emergency: '',
-    emergencyPhone: ''
+    emergencyPhone: '',
+    bankName: '',
+    bankCardAccount: ''
 })
 
 const rules = reactive({
@@ -75,6 +79,17 @@ const rules = reactive({
     emergency: [
         { required: true, message: '紧急联系人不能为空', trigger: 'blur' }
     ],
+    bankName: [
+        { required: true, message: '开户行不能为空', trigger: 'blur' }
+    ],
+    bankCardAccount: [
+        { required: true, message: '银行卡号不能为空', trigger: 'blur' },
+        {
+            pattern: /^[0-9]{16,19}$/,
+            message: '请输入正确的银行卡号',
+            trigger: 'blur'
+        }
+    ],
     emergencyPhone: [
         { required: true, message: '紧急联系人电话不能为空', trigger: 'blur' },
         {
@@ -87,13 +102,14 @@ const rules = reactive({
 
 watch(() => props.user, (newVal) => {
     if (newVal) {
-        form.nickName = newVal.nickName
         form.phone = newVal.phone
         form.email = newVal.email
         form.gender = newVal.gender
-        form.userId = newVal.userId
+        form.id = newVal.id
         form.emergency = newVal.emergency
         form.emergencyPhone = newVal.emergencyPhone
+        form.bankName = newVal.bankName
+        form.bankCardAccount = newVal.bankCardAccount
     }
 }, { immediate: true, deep: true })
 
@@ -104,12 +120,13 @@ const submit = () => {
                 ElMessage.success('修改成功')
                 emit('update:user', {
                     ...props.user,
-                    nickName: form.nickName,
                     phone: form.phone,
                     email: form.email,
                     gender: form.gender,
                     emergency: form.emergency,
-                    emergencyPhone: form.emergencyPhone
+                    emergencyPhone: form.emergencyPhone,
+                    bankName: form.bankName,
+                    bankCardAccount: form.bankCardAccount
                 })
             })
         }

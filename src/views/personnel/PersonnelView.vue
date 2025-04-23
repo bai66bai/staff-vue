@@ -6,11 +6,11 @@
         <el-input v-model="searchForm.username" placeholder="请输入用户名"></el-input>
       </el-form-item>
       <el-form-item label="创建时间">
-            <el-date-picker v-model="createTimeRange" type="daterange" range-separator="-" value-format="YYYY-MM-DD"
-              start-placeholder="开始日期" @change="handleRangeChange" end-placeholder="结束日期" unlink-panels />
-          </el-form-item>
+        <el-date-picker v-model="createTimeRange" type="daterange" range-separator="-" value-format="YYYY-MM-DD"
+          start-placeholder="开始日期" @change="handleRangeChange" end-placeholder="结束日期" unlink-panels />
+      </el-form-item>
       <el-form-item>
-        <el-button type="primary"  plain @click="handleSearch"><el-icon>
+        <el-button type="primary" plain @click="handleSearch"><el-icon>
             <Search />
           </el-icon>搜索</el-button>
         <el-button @click="handleReset"><el-icon>
@@ -20,20 +20,23 @@
     </el-form>
 
     <!-- 表格 -->
-    <el-table :data="tableData" :header-cell-style="{ background: '#f8f8f9' }" style="width: 100% ; height: 100%;"
-      @selection-change="handleSelectionChange">
-      <el-table-column align="center" type="selection" width="55" />
-      <el-table-column align="center" fixed prop="userId" label="用户编号" width="150" />
+    <el-table :data="tableData" :header-cell-style="{ background: '#f8f8f9' }" style="width: 100% ; height: 100%;">
+      <el-table-column align="center" label="#" width="150">
+        <template #default="scope">
+          {{ ((searchForm.pageNum ?? 1) - 1) * (searchForm.pageSize ?? 20) + scope.$index + 1 }}
+        </template>
+      </el-table-column>
       <el-table-column align="center" prop="username" label="用户名" />
-      <el-table-column align="center" prop="nickName" label="用户昵称" />
       <el-table-column align="center" prop="phone" label="手机号" />
+      <el-table-column align="center" prop="bankName" label="开户行" />
+      <el-table-column align="center" prop="bankCardAccount" label="银行卡号" />
       <el-table-column align="center" prop="status" label="状态">
         <template #default="scope">
-                    <el-tag style="animation: none; transition: none;" :type="scope.row.status == '0' ? 'primary' : 'danger'"
-                        :style="{ width: '55px', height: '30px' }">
-                        {{ scope.row.status == "0" ? '在职' : '离职' }}
-                    </el-tag>
-                </template>
+          <el-tag style="animation: none; transition: none;" :type="scope.row.status == '0' ? 'primary' : 'danger'"
+            :style="{ width: '55px', height: '30px' }">
+            {{ scope.row.status == "0" ? '在职' : '离职' }}
+          </el-tag>
+        </template>
       </el-table-column>
       <el-table-column align="center" prop="createdTime" label="创建时间">
         <template #default="scope">
@@ -42,7 +45,7 @@
       </el-table-column>
       <el-table-column align="center" label="操作" width="230">
         <template #default="scope">
-          <el-link type="primary"  v-hasPermi="['staff:user:edit']" @click="handleEdit(scope.row)"><el-icon>
+          <el-link type="primary" v-hasPermi="['staff:user:edit']" @click="handleEdit(scope.row)"><el-icon>
               <Edit />
             </el-icon>修改</el-link>
           <el-link type="primary" v-hasPermi="['staff:user:reset']" @click="handleResetPwd(scope.row)"><el-icon>
@@ -59,17 +62,11 @@
 
 
 
-  <!-- 添加弹出框 -->
   <el-dialog v-model="dialogFormVisible" :title="title" width="50rem" @closed="resetForm(ruleFormRef)">
     <el-form ref="ruleFormRef" :model="formData" :rules="rules" label-width="120px">
       <!-- 用户名 -->
       <el-form-item label="用户名" prop="username">
         {{ formData.username }}
-      </el-form-item>
-
-      <!-- 昵称 -->
-      <el-form-item label="昵称" prop="nickName">
-        <el-input v-model="formData.nickName" placeholder="请输入昵称" />
       </el-form-item>
 
       <!-- 性别 -->
@@ -87,7 +84,7 @@
 
       <!-- 岗位 -->
       <el-form-item label="岗位" prop="posName">
-        <el-select v-model="formData.posIds" multiple placeholder="请选择岗位">
+        <el-select v-model="formData.posIds" filterable multiple placeholder="请选择岗位">
           <el-option v-for="item in postOptions" :key="item.posId" :label="item.posName" :value="item.posId"
             :disabled="item.status == '1'" />
         </el-select>
@@ -131,10 +128,10 @@
 
 <script setup lang="ts">
 import { onMounted, reactive, ref } from "vue";
-import { getPersonnelList,selectPersonnelByUserId, updatePersonnel, resetPassword, syncPersonnel } from '@/api/personnel'
+import { getPersonnelList, selectPersonnelByUserId, updatePersonnel, resetPassword, syncPersonnel } from '@/api/personnel'
 import { Edit, Search, Refresh, Key } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from "element-plus";
-import type { RuleForm, UserQueryParams } from "@/api/personnel/type";
+import type { Personnel, RuleForm, UserQueryParams } from "@/api/personnel/type";
 import Pagination from '@/components/Pagination/index.vue'
 // 搜索表单
 const searchForm = ref<UserQueryParams>({ pageNum: 1, pageSize: 20, params: {} });
@@ -191,20 +188,11 @@ const handleReset = () => {
   getPersonnelAllList();
 };
 
-// 新增
-const handleAdd = async () => {
-  title.value = "添加人员信息"
-  const { data } = await selectPersonnelByUserId();
-  postOptions.value = data.data.posts;
-  dialogFormVisible.value = true
-};
-
-
 const ids = ref<any>([])
 
 // 行选择变化
 const handleSelectionChange = (rows: any[]) => {
-  ids.value = rows.map(item => item.userId)
+  ids.value = rows.map(item => item.id)
   single.value = rows.length != 1
   multiple.value = !rows.length
 };
@@ -224,17 +212,16 @@ interface PostOption {
 const postOptions = ref<PostOption[]>([]);
 //添加
 const formData = reactive<RuleForm>({
-  userId: null,
+  id: null,
   username: '',
-  nickName: '',
   gender: null,
   birthday: null,
   email: '',
   phone: '',
   posIds: [],
-  emergency:'',
-  emergencyPhone:'',
-  empId:'',
+  emergency: '',
+  emergencyPhone: '',
+  empId: '',
   status: '0'
 })
 
@@ -258,11 +245,11 @@ const updatePersonnelMsg = async () => {
     ElMessage.error(result.data.msg ? result.data.msg : '修改失败')
   } else {
     ElMessage.success('修改成功')
-     //刷新页面
-  getPersonnelAllList();
+    //刷新页面
+    getPersonnelAllList();
   }
 
- 
+
   dialogFormVisible.value = false
 }
 
@@ -275,7 +262,7 @@ const resetForm = (formEl: FormInstance | undefined) => {
 //表单校验
 const rules = reactive<FormRules<RuleForm>>({
   username: [
-    {  message: '请输入用户名', trigger: 'blur' },
+    { message: '请输入用户名', trigger: 'blur' },
     { min: 2, message: '用户名最少为两个字', trigger: 'blur' }
   ],
   email: [
@@ -302,9 +289,9 @@ const rules = reactive<FormRules<RuleForm>>({
 })
 
 //重置人员密码模块
-const handleResetPwd = (row: { userId: number }) => {
+const handleResetPwd = (row: RuleForm) => {
   ElMessageBox.confirm(
-    '你确定要重置ID为 ' + row.userId + ' 的密码吗?',
+    '你确定要重置 ' + row.username + ' 的密码吗?',
     '提示',
     {
       confirmButtonText: '确定',
@@ -313,9 +300,8 @@ const handleResetPwd = (row: { userId: number }) => {
     }
   )
     .then(async () => {
-      const userId: number = row.userId
       //调用接口
-      const result = await resetPassword(userId)
+      const result = await resetPassword(row.id as number)
       if (result.data.status !== 200) {
         ElMessage.error(result.data.msg ? result.data.msg : '重置失败')
       } else {
@@ -337,11 +323,11 @@ const handleResetPwd = (row: { userId: number }) => {
 
 
 //点击修改查询数据通过 UserId查询数据 回显
-const handleEdit = async (row: { userId: number }) => {
+const handleEdit = async (row: Personnel) => {
   title.value = "修改人员信息";
   resetForm(ruleFormRef.value);
   dialogFormVisible.value = true
-  const userId: number = row.userId || ids.value[0]
+  const userId: number = row.id || ids.value[0]
   const { data } = await selectPersonnelByUserId(userId);
   postOptions.value = data.data.posts;
   Object.assign(formData, data.data.data)

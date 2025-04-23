@@ -41,7 +41,11 @@
         <el-table :data="tableData" :header-cell-style="{ background: '#f8f8f9' }" style="width: 100% ; height: 100%;"
             @selection-change="handleSelectionChange">
             <el-table-column align="center" type="selection" width="55" />
-            <el-table-column align="center" fixed prop="posId" label="岗位编号" />
+            <el-table-column align="center" label="#" width="150">
+                <template #default="scope">
+                {{ ((pagination.pageNum ?? 1) - 1) * (pagination.pageSize ?? 20) + scope.$index + 1 }}
+                </template>
+            </el-table-column>
             <el-table-column align="center" prop="posCode" label="岗位编码" />
             <el-table-column align="center" prop="posName" label="岗位名称" />
             <el-table-column align="center" prop="status" label="岗位状态">
